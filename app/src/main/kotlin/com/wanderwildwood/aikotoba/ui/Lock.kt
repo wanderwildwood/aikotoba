@@ -1,0 +1,269 @@
+package com.wanderwildwood.aikotoba.ui
+
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import com.mudita.mmd.components.lazy.LazyColumnMMD
+import com.mudita.mmd.components.text.TextMMD
+import com.mudita.mmd.components.text_field.TextFieldMMD
+import com.wanderwildwood.aikotoba.R
+import com.wanderwildwood.aikotoba.vault.Session
+import com.wanderwildwood.aikotoba.vault.VaultFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+/** Nothing chosen yet: open a vault file, or make one. */
+@Composable
+fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: () -> Unit, onGenerate: (() -> Unit)? = null) {
+    val pick = rememberVaultPicker(onOpened)
+    val make = rememberFileMaker(onNew)
+    val newName = stringResource(R.string.new_vault_file_name)
+    Frame(
+        title = stringResource(R.string.app_name),
+        actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
+    ) {
+        LazyColumnMMD(Modifier.fillMaxWidth()) {
+            item { Say(stringResource(R.string.start_what), Modifier.padding(top = 8.dp)) }
+            item { Say(stringResource(R.string.start_file)) }
+            item {
+                Column(Modifier.padding(16.dp)) {
+                    FootButton(stringResource(R.string.start_open), onClick = pick)
+                    Spacer(Modifier.height(12.dp))
+                    FootButton(stringResource(R.string.start_new)) { make(newName) }
+                }
+            }
+            if (onGenerate != null) item { PlainRow(stringResource(R.string.gen_open), onPress = onGenerate) }
+        }
+    }
+}
+
+/**
+ * The master password, and the keyboard's own Done key opens the vault: there is no separate
+ * press to make after typing it.
+ */
+@Composable
+fun UnlockScreen(
+    uri: Uri,
+    visiting: Boolean,
+    onOther: (Uri) -> Unit,
+    onNew: (Uri) -> Unit,
+    onAbout: () -> Unit,
+    onUnlocked: () -> Unit = {},
+    onGenerate: (() -> Unit)? = null,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val keyboard = LocalSoftwareKeyboardController.current
+    var password by remember(uri) { mutableStateOf("") }
+    var shown by remember { mutableStateOf(false) }
+    var keyFile by remember(uri) { mutableStateOf<Pair<String, ByteArray>?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var problem by remember(uri) { mutableStateOf<String?>(null) }
+    val name = remember(uri) { VaultFile(context, uri).name() }
+    var interrupted by remember(uri) { mutableStateOf(false) }
+    val focus = remember { FocusRequester() }
+
+    LaunchedEffect(uri) {
+        interrupted = withContext(Dispatchers.IO) {
+            val current = runCatching { VaultFile(context, uri).read() }.getOrNull()
+            VaultFile.Pending.interrupted(context, uri, current) && VaultFile.previous(context, uri) != null
+        }
+        runCatching { focus.requestFocus() }
+    }
+
+    fun unlock() {
+        if (busy || password.isEmpty() && keyFile == null) return
+        busy = true
+        problem = null
+        keyboard?.hide()
+        scope.launch {
+            val r = withContext(Dispatchers.IO) { Session.unlock(context, uri, password, keyFile?.second) }
+            busy = false
+            when (r) {
+                Session.Opened.Done -> {
+                    password = ""
+                    onUnlocked()
+                }
+                Session.Opened.WrongPassword -> problem = context.getString(R.string.unlock_wrong)
+                is Session.Opened.NotKeePass -> problem = context.getString(R.string.unlock_not_keepass, r.reason)
+                is Session.Opened.Unreadable -> problem = context.getString(R.string.unlock_unreadable, r.reason)
+            }
+        }
+    }
+
+    val pickOther = rememberVaultPicker(onOther)
+    val make = rememberFileMaker(onNew)
+    val newName = stringResource(R.string.new_vault_file_name)
+    val pickKey = rememberOnePicker { u ->
+        scope.launch {
+            val bytes = withContext(Dispatchers.IO) { runCatching { context.contentResolver.openInputStream(u)!!.use { it.readBytes() } }.getOrNull() }
+            if (bytes == null) problem = context.getString(R.string.key_file_unreadable)
+            else keyFile = VaultFile(context, u).name() to bytes
+        }
+    }
+
+    Frame(
+        title = stringResource(R.string.app_name),
+        actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
+    ) {
+        LazyColumnMMD(Modifier.fillMaxWidth()) {
+            item {
+                Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
+                    TextMMD(text = name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                    if (visiting) TextMMD(text = stringResource(R.string.unlock_visiting), style = MaterialTheme.typography.labelSmall)
+                    Spacer(Modifier.height(12.dp))
+                    TextFieldMMD(
+                        value = password,
+                        onValueChange = { password = it; problem = null },
+                        singleLine = true,
+                        enabled = !busy,
+                        placeholder = { TextMMD(text = stringResource(R.string.unlock_password), style = MaterialTheme.typography.labelSmall) },
+                        visualTransformation = if (shown) VisualTransformation.None else PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done, autoCorrectEnabled = false),
+                        keyboardActions = KeyboardActions(onDone = { unlock() }),
+                        trailingIcon = {
+                            BarButton(
+                                if (shown) Icons.VisibilityOff else Icons.Visibility,
+                                stringResource(if (shown) R.string.cd_hide else R.string.cd_show),
+                            ) { shown = !shown }
+                        },
+                        modifier = Modifier.fillMaxWidth().focusRequester(focus),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        TextMMD(
+                            text = keyFile?.let { stringResource(R.string.key_file_is, it.first) } ?: stringResource(R.string.key_file_add),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.weight(1f).clickable(enabled = !busy) { if (keyFile == null) pickKey() else keyFile = null }.padding(vertical = 10.dp),
+                        )
+                    }
+                    when {
+                        busy -> Say(stringResource(R.string.unlock_opening), Modifier.padding(top = 4.dp))
+                        problem != null -> Say(problem!!, Modifier.padding(top = 4.dp), bold = true)
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    FootButton(stringResource(R.string.unlock), enabled = !busy) { unlock() }
+                }
+            }
+            if (interrupted) {
+                item {
+                    Column(Modifier.padding(16.dp)) {
+                        Say(stringResource(R.string.interrupted), bold = true)
+                        FootButton(stringResource(R.string.interrupted_put_back)) {
+                            scope.launch {
+                                val ok = withContext(Dispatchers.IO) {
+                                    val previous = VaultFile.previous(context, uri)
+                                    previous != null && VaultFile(context, uri).write(previous, expected = null) is VaultFile.Saved.Done
+                                }
+                                interrupted = false
+                                Notice.say(context.getString(if (ok) R.string.previous_put_back else R.string.previous_failed))
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        FootButton(stringResource(R.string.interrupted_leave)) {
+                            VaultFile.Pending.end(context)
+                            interrupted = false
+                        }
+                    }
+                }
+            }
+            item { Spacer(Modifier.height(16.dp)) }
+            item { PlainRow(stringResource(R.string.unlock_other), onPress = pickOther) }
+            item { PlainRow(stringResource(R.string.start_new), onPress = { make(newName) }) }
+            if (onGenerate != null) item { PlainRow(stringResource(R.string.gen_open), onPress = onGenerate) }
+        }
+    }
+}
+
+/** A new vault's master password, typed twice. */
+@Composable
+fun CreateScreen(busy: Boolean, onCreate: (String) -> Unit, onCancel: () -> Unit) {
+    var first by remember { mutableStateOf("") }
+    var second by remember { mutableStateOf("") }
+    var problem by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
+    androidx.activity.compose.BackHandler(onBack = onCancel)
+
+    fun go() {
+        problem = when {
+            first.length < 8 -> context.getString(R.string.create_too_short)
+            first != second -> context.getString(R.string.create_mismatch)
+            else -> null
+        }
+        if (problem == null && !busy) onCreate(first)
+    }
+
+    Frame(title = stringResource(R.string.create_title), onBack = onCancel, backIcon = Icons.Close) {
+        LazyColumnMMD(Modifier.fillMaxWidth()) {
+            item { Say(stringResource(R.string.create_what), Modifier.padding(top = 8.dp)) }
+            item {
+                Column(Modifier.padding(16.dp)) {
+                    PasswordField(first, { first = it; problem = null }, stringResource(R.string.create_password), ImeAction.Next, Modifier.focusRequester(focus)) {}
+                    Spacer(Modifier.height(12.dp))
+                    PasswordField(second, { second = it; problem = null }, stringResource(R.string.create_again), ImeAction.Done) { go() }
+                    problem?.let { Say(it, bold = true) }
+                    if (busy) Say(stringResource(R.string.create_making))
+                    Spacer(Modifier.height(12.dp))
+                    FootButton(stringResource(R.string.create_go), enabled = !busy) { go() }
+                }
+            }
+        }
+    }
+}
+
+/** A password box with its own show/hide, ending in [onDone] when the keyboard's key says so. */
+@Composable
+internal fun PasswordField(
+    value: String,
+    onValue: (String) -> Unit,
+    placeholder: String,
+    ime: ImeAction,
+    modifier: Modifier = Modifier,
+    onDone: () -> Unit,
+) {
+    var shown by remember { mutableStateOf(false) }
+    TextFieldMMD(
+        value = value,
+        onValueChange = onValue,
+        singleLine = true,
+        placeholder = { TextMMD(text = placeholder, style = MaterialTheme.typography.labelSmall) },
+        visualTransformation = if (shown) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ime, autoCorrectEnabled = false),
+        keyboardActions = KeyboardActions(onDone = { onDone() }),
+        trailingIcon = {
+            BarButton(if (shown) Icons.VisibilityOff else Icons.Visibility, stringResource(if (shown) R.string.cd_hide else R.string.cd_show)) { shown = !shown }
+        },
+        modifier = modifier.fillMaxWidth(),
+    )
+}

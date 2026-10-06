@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The launcher label and the name everywhere the app is spoken of. -->
+    <string name="app_name">Passwords</string>
+    <string name="share_label">Add to Passwords</string>
+
+    <!-- Screen-reader labels for the bar's icons. -->
+    <string name="cd_back">Back</string>
+    <string name="cd_about">About</string>
+    <string name="cd_settings">Settings</string>
+    <string name="cd_lock">Lock</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_copy">Copy</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_open">Open</string>
+    <string name="cd_show">Show</string>
+    <string name="cd_hide">Hide</string>
+    <string name="cd_new_entry">New entry</string>
+    <string name="cd_new_code">Add a code</string>
+
+    <!-- First open: no vault chosen yet. -->
+    <string name="start_what">Passwords keeps sign-ins and their two-step codes in a KeePass file, the kind KeePassXC opens on a computer.</string>
+    <string name="start_file">That file is the only copy. Keep it in a folder that Nextcloud, Syncthing or a share copies somewhere else, or save a copy now and then: the copy is the backup. Nothing is sent anywhere by this app.</string>
+    <string name="start_open">Open a vault file</string>
+    <string name="start_new">Make a new vault</string>
+    <string name="new_vault_file_name">Passwords.kdbx</string>
+
+    <!-- Unlocking. -->
+    <string name="unlock_password">Master password</string>
+    <string name="unlock">Unlock</string>
+    <string name="unlock_opening">Opening…</string>
+    <string name="unlock_wrong">That password does not open this vault.</string>
+    <string name="unlock_not_keepass">This file did not open as a KeePass vault: %1$s</string>
+    <string name="unlock_unreadable">The file could not be read: %1$s. If it was moved or its app removed, choose it again.</string>
+    <string name="unlock_visiting">Opened from another app, for now. Choose it with Open a different vault to have it remembered.</string>
+    <string name="unlock_other">Open a different vault</string>
+    <string name="key_file_add">Needs a key file too? Choose it</string>
+    <string name="key_file_is">Key file: %1$s (press to remove)</string>
+    <string name="key_file_unreadable">That key file could not be read.</string>
+    <string name="interrupted">The last save to this file may not have finished: the phone stopped part way. The copy from before that save is kept.</string>
+    <string name="interrupted_put_back">Put back the copy from before</string>
+    <string name="interrupted_leave">Leave the file as it is</string>
+
+    <!-- A new vault. -->
+    <string name="create_title">New vault</string>
+    <string name="create_what">Choose the master password. It is the only way in: nobody, this app included, can open the vault without it.</string>
+    <string name="create_password">Master password</string>
+    <string name="create_again">The same again</string>
+    <string name="create_go">Make the vault</string>
+    <string name="create_making">Making the vault…</string>
+    <string name="create_too_short">At least 8 characters.</string>
+    <string name="create_mismatch">The two do not match.</string>
+    <string name="create_failed">The vault could not be written: %1$s</string>
+
+    <!-- The open vault. -->
+    <string name="home_codes">Codes</string>
+    <string name="home_all">All</string>
+    <string name="home_search">Search</string>
+    <string name="home_no_codes">No two-step codes yet. Press + to add one, or bring in the codes from another authenticator in Settings.</string>
+    <string name="home_no_entries">Nothing in this vault yet. Press + to add a sign-in.</string>
+    <string name="codes_change_in">Press a code to copy it. They change in %1$s s.</string>
+    <string name="code_seconds">%1$s s left</string>
+    <string name="code_counter">Next code on request</string>
+    <string name="code_next">Show the next code</string>
+    <string name="code_unreadable">Code unreadable</string>
+    <string name="unsaved_retry">Not saved to the file yet. Press to try again.</string>
+    <string name="unsaved_read_only">Changes are not saved: this file is read only. Press to save the vault to a file of your choosing; it becomes the vault from then on.</string>
+    <string name="read_only_strip">Read only: this file came from somewhere this app cannot write to. Press to save to another file if you want to make changes.</string>
+    <string name="saved_to_new_file">Saved to the new file. That file is the vault now.</string>
+
+    <!-- One entry. -->
+    <string name="label_title">Title</string>
+    <string name="label_username">User name</string>
+    <string name="label_password">Password</string>
+    <string name="label_url">Website</string>
+    <string name="label_notes">Notes</string>
+    <string name="label_code">Two-step code</string>
+    <string name="entry_in_group">In %1$s</string>
+    <string name="entry_delete">Delete</string>
+    <string name="entry_delete_armed">Delete — it goes to the recycle bin; tap again</string>
+    <string name="deleted">Moved to the recycle bin.</string>
+    <string name="copied">%1$s copied. The clipboard is emptied in %2$s seconds.</string>
+
+    <!-- Editing. -->
+    <string name="edit_title">Edit</string>
+    <string name="edit_new_title">New entry</string>
+    <string name="save">Save</string>
+    <string name="edit_generate">Make a new password</string>
+    <string name="edit_no_code">None</string>
+    <string name="edit_code_is">%1$s digits, every %2$s seconds, %3$s</string>
+    <string name="edit_code_counter">%1$s digits, counter-based</string>
+    <string name="edit_code_steam">Steam Guard</string>
+    <string name="edit_add_code">Add a code</string>
+    <string name="edit_replace_code">Replace</string>
+    <string name="edit_remove_code">Remove</string>
+    <string name="edit_remove_code_armed">Remove — tap again</string>
+    <string name="edit_discard_armed">Changes not saved. Press again to leave without them.</string>
+
+    <!-- Saving. -->
+    <string name="saving">Saving…</string>
+    <string name="saved">Saved.</string>
+    <string name="not_saved_read_only">Not saved: this file is read only. The change is kept while the vault is open; press the line at the top of the list to save it to a file you choose.</string>
+    <string name="not_saved_failed">Not saved: %1$s. The file is as it was, and the change is kept while the vault stays open.</string>
+    <string name="not_saved_failed_unsure">Not saved: %1$s. The file may be damaged; the copy from before is kept, and Settings can put it back.</string>
+    <string name="reload_failed">The newer file could not be opened with this vault\'s password.</string>
+    <string name="conflict_what">The vault file changed since it was opened: another phone or computer saved it. This change is not in the file yet.</string>
+    <string name="conflict_reload">Open the newer file (this change is dropped)</string>
+    <string name="conflict_copy">Save this version as a copy</string>
+    <string name="conflict_copy_name">Passwords (this phone).kdbx</string>
+    <string name="conflict_replace">Replace the newer file with this one</string>
+    <string name="conflict_replace_armed">Replace — their change is lost; tap again</string>
+
+    <!-- Adding codes. -->
+    <string name="add_code_title">Add a code</string>
+    <string name="add_codes_title">Add codes</string>
+    <string name="add_code_camera">Take a picture of the QR code</string>
+    <string name="add_code_camera_note">With the phone\'s camera app. The picture is deleted once read.</string>
+    <string name="add_code_picture">Read a QR code in a picture</string>
+    <string name="add_code_picture_note">A screenshot, or a photo already on the phone.</string>
+    <string name="add_code_type">Type the secret key</string>
+    <string name="add_code_file">From another authenticator</string>
+    <string name="add_code_file_note">A kAuth backup or its exported list, an Aegis export without a password, or a text file of otpauth:// links.</string>
+    <string name="add_code_paste">Or paste a link: otpauth:// or a Google Authenticator transfer link</string>
+    <string name="add_code_use_link">Use this link</string>
+    <string name="add_code_reading">Reading…</string>
+    <string name="add_code_no_qr">No QR code found in that picture. A closer, straighter picture usually reads.</string>
+    <string name="add_code_first_of">%1$s codes were found; the first one is used.</string>
+    <string name="add_code_done">Done</string>
+    <string name="type_issuer">Site or service</string>
+    <string name="type_account">Account</string>
+    <string name="type_secret">Secret key</string>
+    <string name="type_secret_bad">That is not a secret key: they are letters A to Z and digits 2 to 7.</string>
+    <string name="type_digits">Digits</string>
+    <string name="type_period">Changes every</string>
+    <string name="type_seconds">%1$s seconds</string>
+    <string name="type_algorithm">Algorithm</string>
+    <string name="type_note">Most sites use 6 digits, 30 seconds and SHA1. Change these only if the site says to.</string>
+
+    <!-- Bringing codes in. -->
+    <string name="review_title">Codes found</string>
+    <string name="review_add">Add</string>
+    <string name="review_steam">Steam Guard</string>
+    <string name="review_counter">counter-based</string>
+    <string name="review_unusual">%1$s digits, %2$s s, %3$s</string>
+    <string name="review_duplicate">already in the vault</string>
+    <string name="import_google">These came through a Google Authenticator transfer, which has no place for how often a code changes: every one arrives as 30 seconds. If a site used 60, its codes will be wrong here; check each against the site once, and change it under Edit if need be.</string>
+    <string name="import_google_short">Google Authenticator transfers count every code in 30-second steps. Check this one against the site once.</string>
+    <string name="import_nothing">Nothing there that this app can read as a code.</string>
+    <string name="import_aegis_encrypted">That Aegis export has a password. Export again from Aegis without one, bring it in, then delete the export.</string>
+    <string name="kauth_title">kAuth backup</string>
+    <string name="kauth_what">This is a kAuth backup. kAuth\'s master password opens it; it is used once, here, and not kept.</string>
+    <string name="kauth_password">kAuth\'s master password</string>
+    <string name="kauth_open">Open the backup</string>
+    <string name="kauth_wrong">That password does not open this backup.</string>
+    <plurals name="review_add_count">
+        <item quantity="one">Add %1$s entry</item>
+        <item quantity="other">Add %1$s entries</item>
+    </plurals>
+    <plurals name="review_failures">
+        <item quantity="one">%1$s could not be read:</item>
+        <item quantity="other">%1$s could not be read:</item>
+    </plurals>
+    <plurals name="import_added">
+        <item quantity="one">%1$s entry added.</item>
+        <item quantity="other">%1$s entries added.</item>
+    </plurals>
+
+    <!-- Settings. -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_vault">Vault</string>
+    <string name="settings_file">Vault file</string>
+    <string name="settings_file_read_only">%1$s (read only)</string>
+    <string name="settings_copy">Save a copy</string>
+    <string name="settings_copy_note">The file is the only copy of the vault, and a copy of it is the backup. It stays locked with the same master password.</string>
+    <string name="settings_previous">Put back the file from before the last save</string>
+    <string name="settings_previous_note">Each save keeps the file as it was, inside this app, until the next.</string>
+    <string name="settings_previous_armed">Put back — this replaces the vault file; tap again</string>
+    <string name="previous_put_back">The file from before the last save is back. Unlock to see it.</string>
+    <string name="previous_failed">The copy from before could not be put back.</string>
+    <string name="settings_password">Change the master password</string>
+    <string name="settings_password_key_file">This vault also needs a key file. Change its password in KeePassXC on a computer.</string>
+    <string name="password_what">The vault is written again at once, locked with the new password. A copy saved before still opens with the old one.</string>
+    <string name="password_go">Change it</string>
+    <string name="password_changed">Master password changed.</string>
+    <string name="settings_locking">Locking</string>
+    <string name="settings_lock_after">Lock when away from the app</string>
+    <string name="settings_lock_leaving">On leaving</string>
+    <plurals name="settings_lock_minutes">
+        <item quantity="one">After %1$s minute</item>
+        <item quantity="other">After %1$s minutes</item>
+    </plurals>
+    <string name="settings_lock_note">It also locks whenever the screen goes dark.</string>
+    <string name="settings_other_apps">Other apps</string>
+    <string name="settings_fill">Fill sign-ins in other apps</string>
+    <string name="settings_fill_on">On.</string>
+    <string name="settings_fill_off">Off. Press to choose Passwords as the phone\'s autofill service.</string>
+    <string name="settings_remember">Remember the app a sign-in was picked for</string>
+    <string name="settings_remember_note">Writes the app\'s name into the entry, so it is offered there first next time.</string>
+    <string name="settings_duraspeed">If fill stops appearing</string>
+    <string name="settings_duraspeed_note">DuraSpeed may have stopped Passwords in the background. Press, choose Open, and switch Passwords on in its list.</string>
+    <string name="settings_bring_in">Bring in codes</string>
+    <string name="settings_bring_in_note">From kAuth, Aegis, Google Authenticator, or otpauth:// links.</string>
+    <string name="settings_close">Close this vault</string>
+    <string name="settings_close_note">The file stays where it is; this app just stops opening it.</string>
+    <string name="copy_saved">Copy saved.</string>
+    <string name="copy_failed">The copy could not be saved.</string>
+
+    <!-- Filling in another app. -->
+    <string name="fill_unlock">Unlock Passwords</string>
+    <string name="fill_search">Search Passwords</string>
+    <string name="fill_title">Fill %1$s</string>
+    <string name="fill_remember">Remember for %1$s</string>
+    <string name="fill_none">Nothing matches.</string>
+
+    <!-- The password generator. -->
+    <string name="gen_title">Make a password</string>
+    <string name="gen_open">Make a password</string>
+    <string name="gen_use">Use</string>
+    <string name="gen_again">Another</string>
+    <string name="gen_strength">About %1$s bits of randomness: %2$s.</string>
+    <string name="gen_weak">weak, guessable by a determined attacker with the file</string>
+    <string name="gen_fair">fair for a website, short for a master password</string>
+    <string name="gen_strong">strong</string>
+    <string name="gen_very_strong">very strong</string>
+    <string name="gen_kind">Kind</string>
+    <string name="gen_kind_chars">Characters</string>
+    <string name="gen_kind_words">Words</string>
+    <string name="gen_length">Length</string>
+    <string name="gen_lower">Lower case</string>
+    <string name="gen_upper">Upper case</string>
+    <string name="gen_digits">Digits</string>
+    <string name="gen_symbols">Symbols</string>
+    <string name="gen_avoid">Leave out look-alikes (l I 1 O 0 o)</string>
+    <string name="gen_words">Words</string>
+    <string name="gen_separator">Between words</string>
+    <string name="gen_sep_dash">Dash</string>
+    <string name="gen_sep_space">Space</string>
+    <string name="gen_sep_dot">Full stop</string>
+    <string name="gen_sep_underscore">Underscore</string>
+    <string name="gen_sep_none">Nothing</string>
+    <string name="gen_words_note">Words from the EFF\'s large word list, 7,776 of them. Easier to type and remember than characters; six words make a good master password.</string>
+
+    <string name="no_app_for_that">There is no app on this phone for that.</string>
+
+    <!-- About. -->
+    <string name="about_title">Passwords %1$s</string>
+    <string name="about_what">Nothing leaves the phone: the app has no internet permission. The vault is a KeePass file wherever you keep it, and that file is the only copy, so a copy of it is the backup.</string>
+    <string name="about_licence">GNU General Public License v3</string>
+    <string name="about_bundled">KeePass files read and written by kotpass (MIT); Argon2 by Argon2Kt (MIT) and the reference Argon2 (CC0); QR codes read by ZXing (Apache 2.0); passphrase words from the EFF large word list (CC BY 3.0); codes and imports from kAuth by OK1CDJ (GPL v3); icons from Material Symbols (Apache 2.0).</string>
+    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
+    <string name="about_close">Close</string>
+</resources>
