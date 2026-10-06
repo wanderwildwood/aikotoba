@@ -37,9 +37,10 @@ Android 12 device.
 - **Copies with a clock on it.** A copied password or code is taken off the clipboard thirty
   seconds later, and it is marked sensitive so a keyboard that keeps a clipboard history leaves
   it out.
-- **Fills sign-ins in other apps** (Android's autofill). Entries are offered to a web page whose
-  address is theirs, and to an app that the entry names; anything else is a search away, and a
-  sign-in picked by hand can be remembered for that app. While the vault is locked the offer is
+- **Fills sign-ins in other apps** (Android's autofill). Entries are offered to a page in a browser
+  whose address is theirs, and to an app that the entry names; anything else is a search away,
+  and a sign-in picked by hand can be remembered for that app. A web page shown inside some other
+  app counts as that app, since the app can read what is filled into it. While the vault is locked the offer is
   a single line that unlocks it.
 - **Locks itself** when the screen goes dark, and after a few minutes away from the app (on
   leaving, 1, 5 or 15 minutes). No screenshots, nothing in the Recents picture.

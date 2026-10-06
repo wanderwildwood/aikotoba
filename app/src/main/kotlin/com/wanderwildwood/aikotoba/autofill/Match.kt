@@ -6,8 +6,8 @@ import java.net.URI
 /**
  * Which entries belong to the app or web page asking to be filled.
  *
- * Only an exact claim counts, never a guess from names: an entry is offered to a web page when
- * its address is that site (or a part of it, `mail.example.org` for `example.org`), and to an app
+ * Only an exact claim counts, never a guess from names: an entry is offered to a browser's page
+ * when its address is that site (or a part of it, `mail.example.org` for `example.org`), and to an app
  * when the entry names the app's package in the way KeePass2Android and KeePassDX write it
  * (`androidapp://<package>` in its URL or in a `KP2A_URL…` or `AndroidApp…` field). Everything
  * else is reached by searching, so a look-alike app cannot be handed a password by its name.

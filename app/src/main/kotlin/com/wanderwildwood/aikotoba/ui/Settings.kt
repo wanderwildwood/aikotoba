@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.res.pluralStringResource
@@ -175,6 +176,9 @@ fun ChangePasswordScreen(onBack: () -> Unit, onChange: (String) -> Unit) {
     var first by remember { mutableStateOf("") }
     var second by remember { mutableStateOf("") }
     var problem by remember { mutableStateOf<String?>(null) }
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
+    val again = remember { androidx.compose.ui.focus.FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
     fun go() {
         problem = when {
             first.length < 8 -> context.getString(R.string.create_too_short)
@@ -188,9 +192,9 @@ fun ChangePasswordScreen(onBack: () -> Unit, onChange: (String) -> Unit) {
             item { Say(stringResource(R.string.password_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {
-                    PasswordField(first, { first = it; problem = null }, stringResource(R.string.create_password), ImeAction.Next) {}
+                    PasswordField(first, { first = it; problem = null }, stringResource(R.string.create_password), ImeAction.Next, Modifier.focusRequester(focus), next = again) {}
                     Spacer(Modifier.height(12.dp))
-                    PasswordField(second, { second = it; problem = null }, stringResource(R.string.create_again), ImeAction.Done) { go() }
+                    PasswordField(second, { second = it; problem = null }, stringResource(R.string.create_again), ImeAction.Done, Modifier.focusRequester(again)) { go() }
                     problem?.let { Say(it, bold = true) }
                     Spacer(Modifier.height(12.dp))
                     FootButton(stringResource(R.string.password_go)) { go() }

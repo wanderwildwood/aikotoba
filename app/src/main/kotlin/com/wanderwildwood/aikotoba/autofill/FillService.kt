@@ -47,7 +47,7 @@ class FillService : AutofillService() {
         val open = Session.open
         if (open != null) {
             open.items
-                .filter { Match.matches(it, fields.packageName, fields.webDomain) }
+                .filter { Match.matches(it, fields.packageName, fields.site(this)) }
                 .take(MAX_OFFERED)
                 .forEach { item -> response.addDataset(dataset(this, item, Vault.password(open.db, item.uuid), fields)) }
         }

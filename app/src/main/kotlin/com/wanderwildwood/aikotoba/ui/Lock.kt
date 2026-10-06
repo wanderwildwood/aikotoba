@@ -212,6 +212,7 @@ fun CreateScreen(busy: Boolean, onCreate: (String) -> Unit, onCancel: () -> Unit
     var problem by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val focus = remember { FocusRequester() }
+    val again = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { focus.requestFocus() } }
     androidx.activity.compose.BackHandler(onBack = onCancel)
 
@@ -229,9 +230,9 @@ fun CreateScreen(busy: Boolean, onCreate: (String) -> Unit, onCancel: () -> Unit
             item { Say(stringResource(R.string.create_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {
-                    PasswordField(first, { first = it; problem = null }, stringResource(R.string.create_password), ImeAction.Next, Modifier.focusRequester(focus)) {}
+                    PasswordField(first, { first = it; problem = null }, stringResource(R.string.create_password), ImeAction.Next, Modifier.focusRequester(focus), next = again) {}
                     Spacer(Modifier.height(12.dp))
-                    PasswordField(second, { second = it; problem = null }, stringResource(R.string.create_again), ImeAction.Done) { go() }
+                    PasswordField(second, { second = it; problem = null }, stringResource(R.string.create_again), ImeAction.Done, Modifier.focusRequester(again)) { go() }
                     problem?.let { Say(it, bold = true) }
                     if (busy) Say(stringResource(R.string.create_making))
                     Spacer(Modifier.height(12.dp))
@@ -250,6 +251,7 @@ internal fun PasswordField(
     placeholder: String,
     ime: ImeAction,
     modifier: Modifier = Modifier,
+    next: FocusRequester? = null,
     onDone: () -> Unit,
 ) {
     var shown by remember { mutableStateOf(false) }
@@ -260,7 +262,7 @@ internal fun PasswordField(
         placeholder = { TextMMD(text = placeholder, style = MaterialTheme.typography.labelSmall) },
         visualTransformation = if (shown) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ime, autoCorrectEnabled = false),
-        keyboardActions = KeyboardActions(onDone = { onDone() }),
+        keyboardActions = KeyboardActions(onDone = { onDone() }, onNext = { next?.requestFocus() }),
         trailingIcon = {
             BarButton(if (shown) Icons.VisibilityOff else Icons.Visibility, stringResource(if (shown) R.string.cd_hide else R.string.cd_show)) { shown = !shown }
         },

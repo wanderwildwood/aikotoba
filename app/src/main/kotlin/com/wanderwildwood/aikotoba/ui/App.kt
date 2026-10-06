@@ -128,7 +128,12 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                     }
                 }
             },
-            onCancel = { creating = null },
+            onCancel = {
+                // The empty file the system made for it goes too, rather than lie about as a
+                // "vault" nothing can open.
+                creating?.let { uri -> runCatching { android.provider.DocumentsContract.deleteDocument(context.contentResolver, uri) } }
+                creating = null
+            },
         )
         vault == null && target == null -> StartScreen(
             onOpened = { uri -> target = uri; visiting = false; prefs.vault = uri },

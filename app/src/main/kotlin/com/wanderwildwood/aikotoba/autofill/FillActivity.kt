@@ -65,6 +65,7 @@ class FillActivity : ComponentActivity() {
             return
         }
         val fields = Fields.from(structure)
+        val site = fields.site(this)
         val appName = runCatching {
             @Suppress("DEPRECATION") // the flags-object overload is Android 13; the Kompakt is 12
             packageManager.getApplicationLabel(packageManager.getApplicationInfo(fields.packageName, 0)).toString()
@@ -76,7 +77,7 @@ class FillActivity : ComponentActivity() {
                 var target by remember { mutableStateOf(prefs.vault) }
                 val vault = open
                 when {
-                    vault != null -> Pick(vault, fields, if (fields.webDomain != null) fields.webDomain else appName, prefs) { item -> fill(item, fields, prefs) }
+                    vault != null -> Pick(vault, fields, site, site ?: appName, prefs) { item -> fill(item, fields, site, prefs) }
                     target == null -> StartScreen(onOpened = { prefs.vault = it; target = it }, onNew = {}, onAbout = {})
                     else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = {})
                 }
@@ -84,12 +85,12 @@ class FillActivity : ComponentActivity() {
         }
     }
 
-    private fun fill(item: Item, fields: Fields, prefs: Prefs) {
+    private fun fill(item: Item, fields: Fields, site: String?, prefs: Prefs) {
         val open = Session.open ?: return
         val dataset = FillService.dataset(this, item, Vault.password(open.db, item.uuid), fields)
         setResult(RESULT_OK, Intent().putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, dataset))
         // An app (not a web page) the entry did not name yet: name it, so it is offered there next time.
-        if (prefs.rememberForApp && fields.webDomain == null && !Match.matches(item, fields.packageName, null) && open.writable) {
+        if (prefs.rememberForApp && site == null && !Match.matches(item, fields.packageName, null) && open.writable) {
             val context = applicationContext
             val claim = Match.claim(fields.packageName)
             background.launch {
@@ -111,11 +112,11 @@ class FillActivity : ComponentActivity() {
 }
 
 @Composable
-private fun Pick(open: Session.Open, fields: Fields, asking: String, prefs: Prefs, onPick: (Item) -> Unit) {
+private fun Pick(open: Session.Open, fields: Fields, site: String?, asking: String, prefs: Prefs, onPick: (Item) -> Unit) {
     var query by remember { mutableStateOf("") }
     var rememberApp by remember { mutableStateOf(prefs.rememberForApp) }
     val q = query.trim()
-    val (matching, rest) = open.items.partition { Match.matches(it, fields.packageName, fields.webDomain) }
+    val (matching, rest) = open.items.partition { Match.matches(it, fields.packageName, site) }
     val shown = (matching + rest).filter { q.isEmpty() || it.title.contains(q, true) || it.username.contains(q, true) || it.url.contains(q, true) }
     Frame(title = stringResource(R.string.fill_title, asking)) {
         TextFieldMMD(
@@ -128,7 +129,7 @@ private fun Pick(open: Session.Open, fields: Fields, asking: String, prefs: Pref
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         )
         LazyColumnMMD(Modifier.fillMaxSize()) {
-            if (fields.webDomain == null) {
+            if (site == null) {
                 item {
                     PlainRow(
                         title = stringResource(R.string.fill_remember, asking),

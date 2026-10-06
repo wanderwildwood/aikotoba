@@ -122,6 +122,8 @@ fun AddCodeScreen(
                     TextFieldMMD(
                         value = link,
                         onValueChange = { link = it },
+                        // One line, so the keyboard's Done key reads the link rather than starting another line.
+                        singleLine = true,
                         placeholder = { TextMMD(text = "otpauth://…", style = MaterialTheme.typography.labelSmall) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, keyboardType = KeyboardType.Uri, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = { if (link.isNotBlank()) onFound(Import.recognise(link)) }),
