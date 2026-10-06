@@ -26,21 +26,35 @@ data class Fields(
          */
         fun from(structure: AssistStructure): Fields {
             val nodes = ArrayList<AssistStructure.ViewNode>()
+            // Where each field sits on the screen. Jetpack Compose lists its fields in the
+            // structure in no particular order (a password box can come before the user name),
+            // so "the box above the password" is decided by position, not by order.
+            val top = HashMap<AssistStructure.ViewNode, Int>()
             var domain: String? = null
-            fun walk(node: AssistStructure.ViewNode) {
+            fun walk(node: AssistStructure.ViewNode, y: Int) {
+                val here = y + node.top - node.scrollY
+                if (com.wanderwildwood.aikotoba.BuildConfig.DEBUG) {
+                    // The shape of the other app's screen, never what is in its fields.
+                    android.util.Log.d(
+                        "aikotoba",
+                        "node ${node.className} id=${node.idEntry} fid=${node.autofillId != null} type=${node.autofillType} " +
+                            "hints=${node.autofillHints?.joinToString()} input=${node.inputType} vis=${node.visibility} top=$here",
+                    )
+                }
                 if (domain == null && !node.webDomain.isNullOrBlank()) domain = node.webDomain
                 if (node.autofillId != null && node.autofillType == View.AUTOFILL_TYPE_TEXT && node.visibility == View.VISIBLE) {
                     nodes += node
+                    top[node] = here
                 }
-                for (i in 0 until node.childCount) walk(node.getChildAt(i))
+                for (i in 0 until node.childCount) walk(node.getChildAt(i), here)
             }
-            for (i in 0 until structure.windowNodeCount) walk(structure.getWindowNodeAt(i).rootViewNode)
+            for (i in 0 until structure.windowNodeCount) walk(structure.getWindowNodeAt(i).rootViewNode, 0)
 
             var user = nodes.firstOrNull { kind(it) == Kind.USER }
             val pass = nodes.firstOrNull { kind(it) == Kind.PASSWORD }
             if (user == null && pass != null) {
-                val before = nodes.takeWhile { it !== pass }
-                user = before.lastOrNull { kind(it) == Kind.TEXT }
+                val passTop = top[pass] ?: 0
+                user = nodes.filter { kind(it) == Kind.TEXT && (top[it] ?: 0) < passTop }.maxByOrNull { top[it] ?: 0 }
             }
             if (user == null && pass == null) {
                 // A first page that asks only for the account ("Next" before the password).
