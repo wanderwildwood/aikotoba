@@ -16,10 +16,17 @@ import org.junit.jupiter.api.Test
 class ImportTest {
     init { TestArgon2.install() }
 
+    private companion object {
+        // Published test secrets: RFC 4226's, a made-up one, and KeePassXC's Steam test key.
+        const val RFC = "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ" // gitleaks:allow (test vector)
+        const val OLD = "KRUGS4ZANFZSAYJAONSWG4TFOQ" // gitleaks:allow (test vector)
+        const val STEAM = "63BEDWCQZKTQWPESARIERL5DTTQFCJTK" // gitleaks:allow (test vector)
+    }
+
     private val accounts = listOf(
         OtpAccount("Example Mail", "ada.whitlock@example.org", "JBSWY3DPEHPK3PXP"),
-        OtpAccount("River Bank", "tomas.reyes", "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", digits = 8, period = 60),
-        OtpAccount("Old Token", "ada", "KRUGS4ZANFZSAYJAONSWG4TFOQ", type = OtpType.HOTP, counter = 7),
+        OtpAccount("River Bank", "tomas.reyes", "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", digits = 8, period = 60),  // gitleaks:allow (test vector)
+        OtpAccount("Old Token", "ada", "KRUGS4ZANFZSAYJAONSWG4TFOQ", type = OtpType.HOTP, counter = 7),  // gitleaks:allow (test vector)
     )
 
     @Test
@@ -56,9 +63,9 @@ class ImportTest {
           {"type":"totp","uuid":"1","name":"ada.whitlock@example.org","issuer":"Example Mail","note":"","icon":null,
            "info":{"secret":"JBSWY3DPEHPK3PXP","algo":"SHA1","digits":6,"period":30}},
           {"type":"totp","uuid":"2","name":"tomas.reyes","issuer":"River Bank","icon":null,
-           "info":{"secret":"GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ","algo":"SHA256","digits":8,"period":60}},
-          {"type":"hotp","uuid":"3","name":"ada","issuer":"Old Token","info":{"secret":"KRUGS4ZANFZSAYJAONSWG4TFOQ","algo":"SHA1","digits":6,"counter":7}},
-          {"type":"steam","uuid":"4","name":"ada_w","issuer":"Steam","info":{"secret":"63BEDWCQZKTQWPESARIERL5DTTQFCJTK","algo":"SHA1","digits":5,"period":30}},
+           "info":{"secret":"$RFC","algo":"SHA256","digits":8,"period":60}},
+          {"type":"hotp","uuid":"3","name":"ada","issuer":"Old Token","info":{"secret":"$OLD","algo":"SHA1","digits":6,"counter":7}},
+          {"type":"steam","uuid":"4","name":"ada_w","issuer":"Steam","info":{"secret":"$STEAM","algo":"SHA1","digits":5,"period":30}},
           {"type":"yandex","uuid":"5","name":"x","issuer":"Yandex","info":{"secret":"JBSWY3DPEHPK3PXP","algo":"SHA256","digits":8,"period":30,"pin":"1234"}}
         ]}}
         """.trimIndent()

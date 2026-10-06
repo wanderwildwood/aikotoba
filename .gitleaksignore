@@ -1,0 +1,7 @@
+# kAuth's own test file: RFC 4226's published test secret, not a credential.
+app/src/test/kotlin/com/ok1cdj/kauth/core/OtpUriTest.kt:generic-api-key:90
+89ebd78fcf77810f876d590af005255848d4fad5:app/src/test/kotlin/com/ok1cdj/kauth/core/OtpUriTest.kt:generic-api-key:90
+# public test vectors, before they were marked
+6f10b4e25d018270817af81b802a76a4cb92791c:app/src/test/kotlin/com/wanderwildwood/aikotoba/importer/ImportTest.kt:generic-api-key:59
+6f10b4e25d018270817af81b802a76a4cb92791c:app/src/test/kotlin/com/wanderwildwood/aikotoba/importer/ImportTest.kt:generic-api-key:60
+6f10b4e25d018270817af81b802a76a4cb92791c:app/src/test/kotlin/com/wanderwildwood/aikotoba/importer/ImportTest.kt:generic-api-key:61
