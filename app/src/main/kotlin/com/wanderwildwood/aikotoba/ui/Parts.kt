@@ -79,7 +79,12 @@ internal fun Bar(
     Column {
         TopAppBarMMD(
             title = { BarTitle(title) },
-            navigationIcon = { if (onBack != null) BarButton(backIcon, androidx.compose.ui.res.stringResource(com.wanderwildwood.aikotoba.R.string.cd_back), onBack) },
+            navigationIcon = {
+                if (onBack != null) {
+                    val says = if (backIcon == Icons.Close) com.wanderwildwood.aikotoba.R.string.cd_close else com.wanderwildwood.aikotoba.R.string.cd_back
+                    BarButton(backIcon, androidx.compose.ui.res.stringResource(says), onBack)
+                }
+            },
             actions = actions,
             showDivider = false,
         )
