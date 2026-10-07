@@ -11,6 +11,8 @@
     <string name="cd_settings">Settings</string>
     <string name="cd_lock">Lock</string>
     <string name="cd_clear">Clear</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_close_search">Close the search</string>
     <string name="cd_copy">Copy</string>
     <string name="cd_edit">Edit</string>
     <string name="cd_open">Open</string>
@@ -57,6 +59,7 @@
     <string name="home_codes">Codes</string>
     <string name="home_all">All</string>
     <string name="home_search">Search</string>
+    <string name="home_search_none">Nothing matches.</string>
     <string name="home_no_codes">No two-step codes yet. Press + to add one, or bring in the codes from another authenticator in Settings.</string>
     <string name="home_no_entries">Nothing in this vault yet. Press + to add a sign-in.</string>
     <string name="codes_change_in">Press a code to copy it. They change in %1$s s.</string>
@@ -114,8 +117,8 @@
     <!-- Adding codes. -->
     <string name="add_code_title">Add a code</string>
     <string name="add_codes_title">Add codes</string>
-    <string name="add_code_camera">Take a picture of the QR code</string>
-    <string name="add_code_camera_note">With the phone\'s camera app. The picture is deleted once read.</string>
+    <string name="add_code_camera">Scan the QR code</string>
+    <string name="add_code_camera_note">Hold the phone over the code. It is read as soon as it is in view.</string>
     <string name="add_code_picture">Read a QR code in a picture</string>
     <string name="add_code_picture_note">A screenshot, or a photo already on the phone.</string>
     <string name="add_code_type">Type the secret key</string>
@@ -127,6 +130,12 @@
     <string name="add_code_no_qr">No QR code found in that picture. A closer, straighter picture usually reads.</string>
     <string name="add_code_first_of">%1$s codes were found; the first one is used.</string>
     <string name="add_code_done">Done</string>
+    <string name="scan_title">Scan the QR code</string>
+    <string name="scan_hint">Hold the code in the square. It is read by itself; there is nothing to press.</string>
+    <string name="scan_starting">Starting the camera…</string>
+    <string name="scan_not_two_step">That code isn\'t a two-step code.</string>
+    <string name="scan_no_permission">Scanning needs the camera. Choose a picture instead, or allow the camera for Passwords in the phone\'s Settings, under Apps.</string>
+    <string name="scan_unavailable">The camera could not be opened. Choose a picture of the code instead.</string>
     <string name="type_issuer">Site or service</string>
     <string name="type_account">Account</string>
     <string name="type_secret">Secret key</string>
@@ -191,6 +200,9 @@
         <item quantity="other">After %1$s minutes</item>
     </plurals>
     <string name="settings_lock_note">It also locks whenever the screen goes dark.</string>
+    <string name="settings_codes">Codes</string>
+    <string name="settings_vibrate">Vibrate when codes change</string>
+    <string name="settings_vibrate_note">A short tick each time the codes change, while they are on screen. It follows the phone\'s touch vibration setting.</string>
     <string name="settings_other_apps">Other apps</string>
     <string name="settings_fill">Fill sign-ins in other apps</string>
     <string name="settings_fill_on">On.</string>
@@ -247,7 +259,7 @@
     <string name="about_title">Passwords %1$s</string>
     <string name="about_what">Nothing leaves the phone: the app has no internet permission. The vault is a KeePass file wherever you keep it, and that file is the only copy, so a copy of it is the backup.</string>
     <string name="about_licence">GNU General Public License v3</string>
-    <string name="about_bundled">KeePass files read and written by kotpass (MIT); Argon2 by Argon2Kt (MIT) and the reference Argon2 (CC0); QR codes read by ZXing (Apache 2.0); passphrase words from the EFF large word list (CC BY 3.0); codes and imports from kAuth by OK1CDJ (GPL v3); icons from Material Symbols (Apache 2.0).</string>
+    <string name="about_bundled">KeePass files read and written by kotpass (MIT); Argon2 by Argon2Kt (MIT) and the reference Argon2 (CC0); the QR scanner from Calm QR by Jacob Moss (Apache 2.0), reading with ZXing (Apache 2.0); passphrase words from the EFF large word list (CC BY 3.0); codes and imports from kAuth by OK1CDJ (GPL v3); icons from Material Symbols (Apache 2.0).</string>
     <string name="about_feed_the_llamas">feed the llamas</string>
     <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <string name="about_close">Close</string>

@@ -19,6 +19,8 @@ okio = "3.15.0"
 argon2kt = "1.6.0"
 # Reading QR codes out of pictures.
 zxing = "3.5.3"
+# The live camera picture the QR scanner reads, as Calm QR uses it.
+camerax = "1.4.1"
 
 junit5 = "5.11.4"
 bouncycastle = "1.78.1"
@@ -41,6 +43,9 @@ kotpass = { module = "app.keemobile:kotpass", version.ref = "kotpass" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 argon2kt = { module = "com.lambdapioneer.argon2kt:argon2kt", version.ref = "argon2kt" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
 
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }

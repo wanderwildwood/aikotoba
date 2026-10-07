@@ -52,6 +52,7 @@ fun SettingsScreen(
     val context = LocalContext.current
     var lockMinutes by remember { mutableIntStateOf(prefs.lockMinutes) }
     var rememberApp by remember { mutableStateOf(prefs.rememberForApp) }
+    var vibrate by remember { mutableStateOf(prefs.vibrateOnChange) }
     var fillOn by remember { mutableStateOf(false) }
     var hasPrevious by remember { mutableStateOf(false) }
     val lifecycle = LocalLifecycleOwner.current
@@ -116,6 +117,17 @@ fun SettingsScreen(
                 )
             }
             item { Say(stringResource(R.string.settings_lock_note)) }
+
+            item { Heading(stringResource(R.string.settings_codes)) }
+            item {
+                PlainRow(
+                    title = stringResource(R.string.settings_vibrate),
+                    note = stringResource(R.string.settings_vibrate_note),
+                    noteLines = 3,
+                    trailing = { SwitchMMD(checked = vibrate, onCheckedChange = null) },
+                    onPress = { vibrate = !vibrate; prefs.vibrateOnChange = vibrate },
+                )
+            }
 
             item { Heading(stringResource(R.string.settings_other_apps)) }
             item {

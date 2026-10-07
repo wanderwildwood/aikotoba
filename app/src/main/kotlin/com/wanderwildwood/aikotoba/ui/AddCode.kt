@@ -25,7 +25,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+import com.caravanfire.calmqr.QrScanner
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
@@ -38,17 +41,16 @@ import com.wanderwildwood.aikotoba.importer.Found
 import com.wanderwildwood.aikotoba.importer.Import
 import com.wanderwildwood.aikotoba.importer.Recognised
 import com.wanderwildwood.aikotoba.otp.OtpSpec
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * The ways a code comes in: a photograph of its QR code, a picture already on the phone, a
- * pasted link, the secret typed by hand, or a file from another authenticator.
+ * The ways a code comes in: its QR code scanned, a picture already on the phone, a pasted link,
+ * the secret typed by hand, or a file from another authenticator.
  *
- * The camera is the phone's own camera app, asked for one picture: this app has no camera
- * permission, and the picture is deleted once read.
+ * The scanner is this app's own, reading the camera's live picture, so it needs no camera app;
+ * the camera permission is asked for the first time it is used, and nothing it sees is kept.
  */
 @Composable
 fun AddCodeScreen(
@@ -63,22 +65,21 @@ fun AddCodeScreen(
     var reading by remember { mutableStateOf(false) }
     var link by remember { mutableStateOf("") }
     var typing by remember { mutableStateOf(false) }
+    var scanning by remember { mutableStateOf(false) }
 
-    fun picture(uri: Uri, delete: File?) {
+    fun picture(uri: Uri) {
         reading = true
         scope.launch {
             val r = readPicture(context, uri)
-            delete?.delete()
             reading = false
             if (r == Recognised.Nothing) Notice.say(context.getString(R.string.add_code_no_qr)) else onFound(r)
         }
     }
 
-    val shot = remember { File(File(context.cacheDir, "shots").apply { mkdirs() }, "qr.jpg") }
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok ->
-        if (ok && shot.length() > 0) picture(Uri.fromFile(shot), shot) else shot.delete()
+    val allowCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) scanning = true else Notice.say(context.getString(R.string.scan_no_permission))
     }
-    val gallery = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) picture(uri, null) }
+    val gallery = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) picture(uri) }
     val file = rememberOnePicker { uri ->
         reading = true
         scope.launch {
@@ -91,6 +92,11 @@ fun AddCodeScreen(
         }
     }
 
+    if (scanning) {
+        ScanScreen(onBack = { scanning = false }, onFound = { r -> scanning = false; onFound(r) })
+        return
+    }
+
     if (typing) {
         TypeSecret(defaultIssuer, defaultAccount, onBack = { typing = false }) { spec -> onFound(Recognised.Codes(Found(listOf(spec)))) }
         return
@@ -101,9 +107,12 @@ fun AddCodeScreen(
             if (reading) item { Say(stringResource(R.string.add_code_reading), bold = true) }
             item {
                 PlainRow(stringResource(R.string.add_code_camera), stringResource(R.string.add_code_camera_note)) {
-                    val uri = FileProvider.getUriForFile(context, context.packageName + ".shots", shot)
-                    Locker.errand()
-                    launch(context) { camera.launch(uri) }
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        scanning = true
+                    } else {
+                        Locker.errand()
+                        launch(context) { allowCamera.launch(Manifest.permission.CAMERA) }
+                    }
                 }
             }
             item {
@@ -134,6 +143,39 @@ fun AddCodeScreen(
                 }
             }
         }
+    }
+}
+
+/**
+ * The scanner: the camera's live picture, read as it comes. A sign-in code goes straight on to
+ * be added; any other code is said not to be one, and the scanner keeps looking.
+ */
+@Composable
+private fun ScanScreen(onBack: () -> Unit, onFound: (Recognised) -> Unit) {
+    val context = LocalContext.current
+    androidx.activity.compose.BackHandler(onBack = onBack)
+    Frame(title = stringResource(R.string.scan_title), onBack = onBack) {
+        Say(stringResource(R.string.scan_hint))
+        QrScanner(
+            starting = stringResource(R.string.scan_starting),
+            onRead = { text ->
+                val t = text.trim()
+                val ours = t.startsWith("otpauth://", ignoreCase = true) || t.startsWith("otpauth-migration://", ignoreCase = true)
+                val r = if (ours) Import.recognise(t) else Recognised.Nothing
+                if (r is Recognised.Codes) {
+                    onFound(r)
+                    true
+                } else {
+                    Notice.say(context.getString(R.string.scan_not_two_step))
+                    false
+                }
+            },
+            onUnavailable = {
+                Notice.say(context.getString(R.string.scan_unavailable))
+                onBack()
+            },
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 

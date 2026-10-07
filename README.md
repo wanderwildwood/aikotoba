@@ -23,9 +23,12 @@ Android 12 device.
   KeePassDX keep it (an `otp` field holding an `otpauth://` link; KeePassXC's older `TOTP Seed`
   fields are read too). The Codes list shows every one; press a code to copy it. TOTP with
   SHA-1, SHA-256 or SHA-512, any number of digits and seconds, counter-based HOTP, and Steam
-  Guard.
-- **Adds a code** from a picture of its QR code (taken with the phone's camera app, or one
-  already on the phone), a pasted `otpauth://` link, or the secret typed by hand.
+  Guard. A search beside *Codes* and *All* narrows the list by name, issuer or account as you
+  type. Each time the codes change, the phone gives one short tick while they are on screen
+  (Settings can turn it off; it follows the phone's own touch vibration setting).
+- **Adds a code** by scanning its QR code with the app's own scanner, which reads the camera's
+  live picture and goes on to the code as soon as one is in view, with nothing to press; from a
+  picture already on the phone; from a pasted `otpauth://` link; or from the secret typed by hand.
 - **Brings codes in from other authenticators:** a kAuth backup (opened with kAuth's own master
   password) or kAuth's exported list, an Aegis export without a password, and Google
   Authenticator's transfer codes. Google's transfer format has no place for how often a code
@@ -71,8 +74,9 @@ so a save takes as long as an unlock.
 
 - **Nothing leaves the phone through it.** The app has no internet permission. It does not
   sync; whatever already syncs the folder does.
-- **No camera permission.** A QR code is photographed by the phone's camera app, and the picture
-  is deleted once read.
+- **The camera only for scanning.** The permission is asked the first time a code is scanned,
+  the picture is read as it comes and nothing of it is kept, and a picture already on the phone
+  still works without it.
 - **Not saved from other apps.** Filling never offers to save what you typed elsewhere.
 - **A read-only vault stays read-only.** A file the app was only allowed to read (a server's
   file through Files before its version 0.3.0, for one) is not written; the list says so at the
@@ -134,7 +138,13 @@ For updates without doing this by hand, add this repository to
   the code generation, the `otpauth://` and Google Authenticator transfer readers, and kAuth's
   backup format are its own files, under `com/ok1cdj/kauth/core`, with their notices. One change,
   marked in the file: kAuth's Argon2id is reached through the same native Argon2.
-- [ZXing](https://github.com/zxing/zxing) (Apache 2.0) reads QR codes in pictures.
+- [Calm QR](https://github.com/jacobrmoss/calm-qr) by Jacob Moss (Apache 2.0): the QR scanner,
+  its live camera picture and the way it focuses on a code, under `com/caravanfire/calmqr` with
+  its notice and licence. Changed, as the file says: it reads with ZXing in place of Calm QR's
+  own Rust decoder.
+- [ZXing](https://github.com/zxing/zxing) (Apache 2.0) reads QR codes, in the camera's picture
+  and in pictures on the phone. [CameraX](https://developer.android.com/jetpack/androidx/releases/camera)
+  (Apache 2.0) runs the camera.
 - The [EFF large word list](https://www.eff.org/dice) (CC BY 3.0) for passphrases.
 - [MMD](https://github.com/mudita/MMD) (Apache 2.0), Mudita's design system, and icons from
   Material Symbols (Apache 2.0).
@@ -155,4 +165,5 @@ the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program. If
 not, see <https://www.gnu.org/licenses/>.
 
-The kAuth files keep their own GPL-3.0-or-later notices, which allow them here.
+The kAuth files keep their own GPL-3.0-or-later notices, which allow them here. The Calm QR
+file keeps its Apache 2.0 notice, with the licence beside it.

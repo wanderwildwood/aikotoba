@@ -24,6 +24,11 @@ class Prefs(context: Context) {
         get() = p.getBoolean("showCodes", true)
         set(value) { p.edit().putBoolean("showCodes", value).apply() }
 
+    /** A light tick each time the codes on screen change. */
+    var vibrateOnChange: Boolean
+        get() = p.getBoolean("vibrateOnChange", true)
+        set(value) { p.edit().putBoolean("vibrateOnChange", value).apply() }
+
     /** Offer a sign-in picked by hand for an app the next time that app asks. */
     var rememberForApp: Boolean
         get() = p.getBoolean("rememberForApp", true)

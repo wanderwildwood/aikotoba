@@ -15,8 +15,8 @@ android {
         // The Kompakt runs Android 12 (API 31); nothing here needs anything newer.
         minSdk = 31
         targetSdk = 31
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.1.1"
     }
 
     // A real keystore in signing/ signs every build type when it is present, so the
@@ -119,6 +119,9 @@ dependencies {
     // Argon2Kt names AppCompat as a runtime dependency and never uses it.
     implementation(libs.argon2kt) { exclude(group = "androidx.appcompat") }
     implementation(libs.zxing.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
 
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)

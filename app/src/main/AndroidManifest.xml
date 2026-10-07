@@ -2,15 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- No internet permission, and none will be added: the vault never leaves the phone
-         through this app. The one permission is the alarm that empties the clipboard thirty
-         seconds after a copy, should the app have been closed in between. -->
+         through this app. The alarm empties the clipboard thirty seconds after a copy, should
+         the app have been closed in between; the camera is the QR scanner's, asked for the
+         first time a code is scanned. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <queries>
-        <!-- The camera app that takes the picture of a QR code. -->
-        <intent>
-            <action android:name="android.media.action.IMAGE_CAPTURE" />
-        </intent>
         <!-- The other apps that act on selected text, for the ⋮ in the selection menu. -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
@@ -110,17 +109,6 @@
         <receiver
             android:name=".Clipboard$ClearReceiver"
             android:exported="false" />
-
-        <!-- Where the camera app puts the one picture of a QR code; deleted once read. -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.shots"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/shots" />
-        </provider>
 
     </application>
 
