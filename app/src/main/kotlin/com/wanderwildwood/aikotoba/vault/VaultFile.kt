@@ -77,6 +77,12 @@ class VaultFile(private val context: Context, val uri: Uri) {
             writeWhole(bytes)
             if (sha256(read()).contentEquals(newHash)) null else "it read back different"
         } catch (e: Exception) {
+            if (refusedAsChanged(e)) {
+                // The server's file was saved by someone else while this went up, and Files
+                // refused to replace it: nothing was written, and there is nothing to put back.
+                Pending.end(context)
+                return Saved.Changed
+            }
             e.message ?: e.javaClass.simpleName
         }
         if (problem == null) {
@@ -122,6 +128,16 @@ class VaultFile(private val context: Context, val uri: Uri) {
     }
 
     companion object {
+        /**
+         * Files (tana) saves a server's file when the app closes it, after this has returned, so
+         * it cannot refuse the write itself. A refusal because the server's file changed is said
+         * to the next read instead, in these words.
+         */
+        private const val CHANGED_ON_THE_SERVER = "changed on the server"
+
+        fun refusedAsChanged(e: Exception): Boolean =
+            e is java.io.FileNotFoundException && e.message?.contains(CHANGED_ON_THE_SERVER) == true
+
         private const val PREVIOUS = "previous.kdbx"
         private const val PREVIOUS_FROM = "previous.from"
 
