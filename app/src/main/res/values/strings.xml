@@ -69,7 +69,7 @@
     <string name="home_search_none">Nothing matches.</string>
     <string name="home_no_codes">No two-step codes yet. Press + to add one, or bring in the codes from another authenticator in Settings.</string>
     <string name="home_no_entries">Nothing in this vault yet. Press + to add a sign-in.</string>
-    <string name="codes_change_in">Press a code to copy it. They change in %1$s s.</string>
+    <string name="codes_press_to_copy">Press a code to copy it.</string>
     <string name="code_seconds">%1$s s left</string>
     <string name="code_counter">Next code on request</string>
     <string name="code_next">Show the next code</string>

@@ -82,6 +82,16 @@ fun HomeScreen(
         (!codes || item.otp != null) && (q.isEmpty() || item.findable(codes).any { it.contains(q, ignoreCase = true) })
     }
     BackHandler(enabled = searching) { searching = false; query = "" }
+    // One clock for the codes and the seconds beside the magnifier, so the two never disagree.
+    val now = if (codes) rememberNow() else 0L
+    // The step the pinned seconds count: thirty when any code uses it (nearly every site does),
+    // else the one step they all share. A code on another step says its own on its row.
+    val timed = open.items.mapNotNull { it.otp }.filter { !it.isCounter }
+    val pinned = when {
+        timed.isEmpty() -> null
+        timed.any { it.period == 30 } -> 30
+        else -> timed.map { it.period }.distinct().singleOrNull() ?: 30
+    }
     Frame(
         title = stringResource(R.string.app_name),
         actions = {
@@ -122,6 +132,8 @@ fun HomeScreen(
         }
         // The search lives on the same line as Codes and All, so the list keeps every row it had:
         // the magnifier opens a field beside them, and what is typed narrows the list at once.
+        // This line stays while the list scrolls, so the seconds until the codes change sit
+        // here, before the magnifier, and are in view from the foot of a long list too.
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 4.dp)) {
             Choice(stringResource(R.string.home_codes), codes) { codes = true; prefs.showCodes = true }
             Choice(stringResource(R.string.home_all), !codes) { codes = false; prefs.showCodes = false }
@@ -130,11 +142,18 @@ fun HomeScreen(
                 BarButton(Icons.Close, stringResource(R.string.cd_close_search)) { searching = false; query = "" }
             } else {
                 Spacer(Modifier.weight(1f))
+                if (codes && pinned != null) {
+                    TextMMD(
+                        text = stringResource(R.string.code_seconds, Otp.secondsRemaining(pinned, now).toString()),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 8.dp, end = 4.dp),
+                    )
+                }
                 BarButton(Icons.Search, stringResource(R.string.cd_search)) { searching = true }
             }
         }
         val none = if (q.isNotEmpty() && items.isEmpty()) stringResource(R.string.home_search_none) else null
-        if (codes) CodeList(items, onEntry, prefs.vibrateOnChange, empty = none ?: if (open.items.any { it.otp != null }) null else stringResource(R.string.home_no_codes))
+        if (codes) CodeList(items, onEntry, now, pinned, prefs.vibrateOnChange, empty = none ?: if (open.items.any { it.otp != null }) null else stringResource(R.string.home_no_codes))
         else EntryList(items, onEntry, empty = none ?: if (open.items.isEmpty()) stringResource(R.string.home_no_entries) else null)
     }
 }
@@ -235,22 +254,21 @@ internal fun rememberNow(): Long {
 }
 
 /**
- * Every code, each pressed to copy. The seconds left are said once, at the top, for the
- * thirty-second codes nearly every site uses; a code on another step says its own. On this
- * panel one changing number is better than a column of them.
+ * Every code, each pressed to copy. The seconds left are said once, on the line above the
+ * list, for the [pinned] step nearly every site uses; a code on another step says its own
+ * here. On this panel one changing number is better than a column of them.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, vibrate: Boolean, empty: String?) {
+private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinned: Int?, vibrate: Boolean, empty: String?) {
     val context = LocalContext.current
-    val now = rememberNow()
     TickOnChange(vibrate, items.mapNotNull { it.otp }.filter { !it.isCounter }.map { it.period }.distinct().sorted())
     LazyColumnMMD(Modifier.fillMaxSize()) {
         if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
-        if (items.any { it.otp?.let { s -> !s.isCounter && s.period == 30 } == true }) {
-            item(key = "clock") {
+        if (items.any { it.otp != null }) {
+            item(key = "hint") {
                 TextMMD(
-                    text = stringResource(R.string.codes_change_in, Otp.secondsRemaining(30, now).toString()),
+                    text = stringResource(R.string.codes_press_to_copy),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
                 )
@@ -289,7 +307,7 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, vibrate: Boolea
                         )
                         val own = when {
                             spec.isCounter -> stringResource(R.string.code_counter)
-                            spec.period != 30 -> stringResource(R.string.code_seconds, Otp.secondsRemaining(spec.period, now).toString())
+                            spec.period != pinned -> stringResource(R.string.code_seconds, Otp.secondsRemaining(spec.period, now).toString())
                             else -> null
                         }
                         if (own != null) TextMMD(text = own, style = MaterialTheme.typography.labelSmall)

@@ -23,8 +23,11 @@ Android 12 device.
   KeePassDX keep it (an `otp` field holding an `otpauth://` link; KeePassXC's older `TOTP Seed`
   fields are read too). The Codes list shows every one; press a code to copy it. TOTP with
   SHA-1, SHA-256 or SHA-512, any number of digits and seconds, counter-based HOTP, and Steam
-  Guard. A search beside *Codes* and *All* narrows the list by name, issuer or account as you
-  type. Each time the codes change, the phone gives one short tick while they are on screen
+  Guard. The seconds until the codes change sit on the line above the list, beside the
+  magnifier, so they stay in view however far down a long list you are; a code on another
+  step says its own on its row. A search beside *Codes* and *All* narrows the list by name,
+  issuer or account as you type. Each time the codes change, the phone gives one short tick
+  while they are on screen
   (Settings can turn it off; it follows the phone's own touch vibration setting).
 - **Adds a code** by scanning its QR code with the app's own scanner, which reads the camera's
   live picture and goes on to the code as soon as one is in view, with nothing to press; from a
