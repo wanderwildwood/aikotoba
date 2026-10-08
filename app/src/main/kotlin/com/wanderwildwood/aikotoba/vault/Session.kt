@@ -38,6 +38,14 @@ object Session {
         val writable: Boolean,
         /** True while there are changes in [db] the file does not have. */
         val unsaved: Boolean = false,
+        /** The key file as chosen, if the vault needs one, so fingerprint unlock can keep it. */
+        val keyFile: ByteArray? = null,
+        /**
+         * The master password as typed, masked in memory the way kotpass masks its own values
+         * (kotpass itself keeps only its hash, which opens the file just as well but is not
+         * what a person types). Held so fingerprint unlock can be turned on without asking.
+         */
+        val passphrase: EncryptedValue? = null,
     ) {
         val items: List<Item> by lazy { Vault.items(db) }
     }
@@ -72,7 +80,7 @@ object Session {
             if (com.wanderwildwood.aikotoba.BuildConfig.DEBUG) {
                 android.util.Log.i("aikotoba", "opened in ${android.os.SystemClock.elapsedRealtime() - started} ms")
             }
-            _state.value = Open(uri, file.name(), db, VaultFile.sha256(bytes), file.writable())
+            _state.value = Open(uri, file.name(), db, VaultFile.sha256(bytes), file.writable(), keyFile = keyFile, passphrase = EncryptedValue.fromString(password))
             Opened.Done
         } catch (e: CryptoError.InvalidKey) {
             Opened.WrongPassword
@@ -104,7 +112,7 @@ object Session {
         val file = VaultFile(context, uri)
         return when (val r = file.write(bytes, expected = null)) {
             is VaultFile.Saved.Done -> {
-                _state.value = Open(uri, file.name(), db, r.hash, file.writable())
+                _state.value = Open(uri, file.name(), db, r.hash, file.writable(), passphrase = EncryptedValue.fromString(password))
                 Opened.Done
             }
             is VaultFile.Saved.Failed -> Opened.Unreadable(r.reason)
@@ -131,7 +139,7 @@ object Session {
     fun save(context: Context, force: Boolean = false, change: (KeePassDatabase) -> KeePassDatabase): Saved {
         val current = _state.value ?: return Saved.Failed("the vault is locked", restored = true)
         val db = change(current.db)
-        val pending = Open(current.uri, current.name, db, current.hash, current.writable, unsaved = true)
+        val pending = Open(current.uri, current.name, db, current.hash, current.writable, unsaved = true, keyFile = current.keyFile, passphrase = current.passphrase)
         _state.value = pending
         if (!current.writable) return Saved.ReadOnly
         val bytes = try {
@@ -143,7 +151,7 @@ object Session {
             is VaultFile.Saved.Done -> {
                 // Only if nothing else replaced the state meanwhile (a lock, another vault).
                 if (_state.value === pending) {
-                    _state.value = Open(current.uri, current.name, db, r.hash, current.writable, unsaved = false)
+                    _state.value = Open(current.uri, current.name, db, r.hash, current.writable, unsaved = false, keyFile = current.keyFile, passphrase = current.passphrase)
                 }
                 Saved.Done
             }
@@ -166,7 +174,7 @@ object Session {
         val file = VaultFile(context, uri)
         return when (val r = file.write(bytes, expected = null)) {
             is VaultFile.Saved.Done -> {
-                _state.value = Open(uri, file.name(), current.db, r.hash, file.writable())
+                _state.value = Open(uri, file.name(), current.db, r.hash, file.writable(), keyFile = current.keyFile, passphrase = current.passphrase)
                 Saved.Done
             }
             VaultFile.Saved.Changed -> Saved.Changed
@@ -181,7 +189,7 @@ object Session {
         return try {
             val bytes = file.read()
             val db = decode(bytes, current.db.credentials)
-            _state.value = Open(current.uri, current.name, db, VaultFile.sha256(bytes), current.writable)
+            _state.value = Open(current.uri, current.name, db, VaultFile.sha256(bytes), current.writable, keyFile = current.keyFile, passphrase = current.passphrase)
             Opened.Done
         } catch (e: CryptoError.InvalidKey) {
             Opened.WrongPassword
@@ -196,13 +204,29 @@ object Session {
     /** Whether the open vault also needs a key file; its password is then changed on a computer. */
     val hasKeyFile: Boolean get() = _state.value?.db?.credentials?.key != null
 
+    /** What opened the vault, for fingerprint unlock to keep: the master password and the key file. */
+    fun secret(): Fingerprint.Secret? {
+        val current = _state.value ?: return null
+        val password = current.passphrase?.text ?: return null
+        if (current.db.credentials.key != null && current.keyFile == null) return null
+        return Fingerprint.Secret(password, current.keyFile)
+    }
+
     /** A new master password; the file is written with it at once. */
-    fun changePassword(context: Context, password: String): Saved = save(context) { db ->
-        val credentials = credentials(password, null)
-        when (db) {
-            is KeePassDatabase.Ver3x -> db.copy(credentials = credentials)
-            is KeePassDatabase.Ver4x -> db.copy(credentials = credentials)
-        }.modifyMeta { copy(masterKeyChanged = Instant.now()) }
+    fun changePassword(context: Context, password: String): Saved {
+        val r = save(context) { db ->
+            val credentials = credentials(password, null)
+            when (db) {
+                is KeePassDatabase.Ver3x -> db.copy(credentials = credentials)
+                is KeePassDatabase.Ver4x -> db.copy(credentials = credentials)
+            }.modifyMeta { copy(masterKeyChanged = Instant.now()) }
+        }
+        if (r == Saved.Done) {
+            _state.value?.let { c ->
+                _state.value = Open(c.uri, c.name, c.db, c.hash, c.writable, c.unsaved, c.keyFile, EncryptedValue.fromString(password))
+            }
+        }
+        return r
     }
 
     fun decode(bytes: ByteArray, credentials: Credentials): KeePassDatabase = try {

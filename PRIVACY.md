@@ -7,13 +7,15 @@ policy that cannot be checked is just a promise.
 
 ## What it asks for, and why
 
-`app/src/main/AndroidManifest.xml` declares one permission, and `INTERNET` is not it.
+`app/src/main/AndroidManifest.xml` declares three permissions, and `INTERNET` is not among them.
 
 - **Alarms** (`SCHEDULE_EXACT_ALARM`) — to empty the clipboard thirty seconds after a copy, even
   if the app was closed in between. Android 12 grants it without asking.
-
-There is no camera permission: a QR code is photographed by the phone's own camera app, which
-hands the one picture back, and the picture is deleted once read.
+- **Camera** (`CAMERA`) — only for the QR scanner, asked the first time a code is scanned. The
+  live picture is read for a code and nothing of it is kept.
+- **Fingerprint** (`USE_BIOMETRIC`) — only when Settings → Unlock with fingerprint is on. The
+  reading happens in the phone's own fingerprint sheet; the app never sees the fingerprint, only
+  whether the phone accepted it.
 
 ## Where your passwords are
 
@@ -22,12 +24,17 @@ app reads it through Android's file picker and writes back only to that file. Wh
 unlocked its contents are in the app's memory; locking (by hand, when the screen goes dark, or
 after the minutes chosen in Settings) drops them.
 
-Two things are kept inside the app:
+What is kept inside the app:
 
 - **Its settings**: which file is the vault, how long until it locks, which list opens first, and
   the password generator's choices. No password, key or entry.
 - **The vault file as it was before the last save**, which is as encrypted as the file itself, so
   a save that goes wrong can be undone. It is deleted when the vault is closed in Settings.
+- **With fingerprint unlock on, the master password encrypted** (AES-GCM) by a key that lives in
+  the phone's hardware key store and never leaves it. That key can only be used right after a
+  registered fingerprint is read, and the phone destroys it if a fingerprint is added or removed.
+  Turning the setting off, or closing the vault, deletes both the key and the ciphertext. Nothing
+  that could open the vault is ever written in the clear.
 
 Both are left out of Android's backups and device-to-device transfers (`allowBackup="false"`, and
 data-extraction rules that exclude everything).

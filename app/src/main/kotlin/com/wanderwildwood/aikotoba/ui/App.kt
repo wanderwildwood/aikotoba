@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import app.keemobile.kotpass.database.KeePassDatabase
 import com.wanderwildwood.aikotoba.Prefs
 import com.wanderwildwood.aikotoba.R
@@ -24,6 +25,7 @@ import com.wanderwildwood.aikotoba.importer.Qr
 import com.wanderwildwood.aikotoba.importer.Recognised
 import com.wanderwildwood.aikotoba.otp.OtpField
 import com.wanderwildwood.aikotoba.vault.Draft
+import com.wanderwildwood.aikotoba.vault.Fingerprint
 import com.wanderwildwood.aikotoba.vault.Session
 import com.wanderwildwood.aikotoba.vault.Vault
 import com.wanderwildwood.aikotoba.vault.VaultFile
@@ -290,15 +292,31 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                     onClose = {
                         Session.lock()
                         VaultFile.forgetPrevious(context)
+                        Fingerprint.forget(context)
                         prefs.vault = null
                         target = null
                     },
                     actions = actions,
                 )
-                Route.ChangePassword -> ChangePasswordScreen(
-                    onBack = back,
-                    onChange = { password -> actions.changePassword(password) { if (it) back() } },
-                )
+                Route.ChangePassword -> {
+                    val keepTitle = stringResource(R.string.fingerprint_keep_title)
+                    val keepSubtitle = stringResource(R.string.fingerprint_keep_subtitle)
+                    ChangePasswordScreen(
+                        onBack = back,
+                        onChange = { password ->
+                            actions.changePassword(password) { changed ->
+                                if (!changed) return@changePassword
+                                back()
+                                // What fingerprint unlock keeps is the old password now; one reading keeps the new.
+                                if (Fingerprint.enrolledFor(context, vault.uri)) {
+                                    enrolFingerprint(context, vault.uri, keepTitle, keepSubtitle) { kept ->
+                                        if (!kept) Notice.say(context.getString(R.string.fingerprint_off_password_changed))
+                                    }
+                                }
+                            }
+                        },
+                    )
+                }
             }
             if (conflict) {
                 ConflictDialog(

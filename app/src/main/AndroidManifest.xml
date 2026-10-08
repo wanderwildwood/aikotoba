@@ -4,12 +4,21 @@
     <!-- No internet permission, and none will be added: the vault never leaves the phone
          through this app. The alarm empties the clipboard thirty seconds after a copy, should
          the app have been closed in between; the camera is the QR scanner's, asked for the
-         first time a code is scanned. -->
+         first time a code is scanned. The fingerprint sensor opens the vault when Settings says
+         so, through the phone's own fingerprint sheet; the app never sees the fingerprint. -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <queries>
+        <!-- The apps that keep files (Files, a Nextcloud app, Syncthing): the vault lives in one of
+             them. Without this, from Android 11 on, the right to a file picked through one of them
+             outlives the app's own ability to see that app: an update of Passwords left a vault on
+             a server unreachable, "no provider", with its permission still granted. -->
+        <intent>
+            <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+        </intent>
         <!-- The other apps that act on selected text, for the ⋮ in the selection menu. -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />

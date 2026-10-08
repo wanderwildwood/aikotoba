@@ -1,6 +1,8 @@
 package com.wanderwildwood.aikotoba.ui
 
+import android.content.Context
 import android.net.Uri
+import android.security.keystore.KeyPermanentlyInvalidatedException
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,7 +36,9 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
+import com.wanderwildwood.aikotoba.Locker
 import com.wanderwildwood.aikotoba.R
+import com.wanderwildwood.aikotoba.vault.Fingerprint
 import com.wanderwildwood.aikotoba.vault.Session
 import com.wanderwildwood.aikotoba.vault.VaultFile
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +72,8 @@ fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: () -> Un
 
 /**
  * The master password, and the keyboard's own Done key opens the vault: there is no separate
- * press to make after typing it.
+ * press to make after typing it. With fingerprint unlock on for this vault, the phone's
+ * fingerprint sheet comes up first and a button brings it back; the password field stays.
  */
 @Composable
 fun UnlockScreen(
@@ -90,14 +95,28 @@ fun UnlockScreen(
     var problem by remember(uri) { mutableStateOf<String?>(null) }
     val name = remember(uri) { VaultFile(context, uri).name() }
     var interrupted by remember(uri) { mutableStateOf(false) }
+    var fingerprint by remember(uri) { mutableStateOf(false) }
     val focus = remember { FocusRequester() }
+    val fingerprintTitle = stringResource(R.string.fingerprint_open_title)
+    val fingerprintNegative = stringResource(R.string.fingerprint_use_password)
 
-    LaunchedEffect(uri) {
-        interrupted = withContext(Dispatchers.IO) {
-            val current = runCatching { VaultFile(context, uri).read() }.getOrNull()
-            VaultFile.Pending.interrupted(context, uri, current) && VaultFile.previous(context, uri) != null
+    fun opened(r: Session.Opened, byFingerprint: Boolean) {
+        when (r) {
+            Session.Opened.Done -> {
+                password = ""
+                onUnlocked()
+            }
+            Session.Opened.WrongPassword -> if (byFingerprint) {
+                // The file's password was changed elsewhere (a computer): what was kept no longer opens it.
+                Fingerprint.forget(context)
+                fingerprint = false
+                problem = context.getString(R.string.fingerprint_password_changed)
+            } else {
+                problem = context.getString(R.string.unlock_wrong)
+            }
+            is Session.Opened.NotKeePass -> problem = context.getString(R.string.unlock_not_keepass, r.reason)
+            is Session.Opened.Unreadable -> problem = context.getString(R.string.unlock_unreadable, r.reason)
         }
-        runCatching { focus.requestFocus() }
     }
 
     fun unlock() {
@@ -108,16 +127,80 @@ fun UnlockScreen(
         scope.launch {
             val r = withContext(Dispatchers.IO) { Session.unlock(context, uri, password, keyFile?.second) }
             busy = false
-            when (r) {
-                Session.Opened.Done -> {
-                    password = ""
-                    onUnlocked()
+            opened(r, byFingerprint = false)
+        }
+    }
+
+    /** The phone's fingerprint sheet; what it unlocks is the master password, kept encrypted. */
+    fun unlockByFingerprint() {
+        if (busy) return
+        val cipher = try {
+            Fingerprint.cipherToOpen(context, uri)
+        } catch (e: KeyPermanentlyInvalidatedException) {
+            // A fingerprint was added or removed on the phone: the key is gone, by design.
+            Fingerprint.forget(context)
+            fingerprint = false
+            problem = context.getString(R.string.fingerprint_changed)
+            runCatching { focus.requestFocus() }
+            return
+        } catch (e: Exception) {
+            Fingerprint.forget(context)
+            fingerprint = false
+            problem = context.getString(R.string.fingerprint_failed, e.message ?: e.javaClass.simpleName)
+            runCatching { focus.requestFocus() }
+            return
+        }
+        if (cipher == null) {
+            fingerprint = false
+            runCatching { focus.requestFocus() }
+            return
+        }
+        problem = null
+        keyboard?.hide()
+        Fingerprint.prompt(context, fingerprintTitle, name, fingerprintNegative, cipher) { read ->
+            when (read) {
+                is Fingerprint.Read.Done -> {
+                    busy = true
+                    scope.launch {
+                        val r = withContext(Dispatchers.IO) {
+                            val secret = runCatching { Fingerprint.open(context, read.cipher) }.getOrNull()
+                                ?: return@withContext null
+                            Session.unlock(context, uri, secret.password, secret.keyFile)
+                        }
+                        busy = false
+                        if (r == null) {
+                            Fingerprint.forget(context)
+                            fingerprint = false
+                            problem = context.getString(R.string.fingerprint_changed)
+                            runCatching { focus.requestFocus() }
+                        } else {
+                            opened(r, byFingerprint = true)
+                        }
+                    }
                 }
-                Session.Opened.WrongPassword -> problem = context.getString(R.string.unlock_wrong)
-                is Session.Opened.NotKeePass -> problem = context.getString(R.string.unlock_not_keepass, r.reason)
-                is Session.Opened.Unreadable -> problem = context.getString(R.string.unlock_unreadable, r.reason)
+                Fingerprint.Read.Cancelled -> runCatching { focus.requestFocus() }
+                is Fingerprint.Read.Failed -> {
+                    problem = context.getString(R.string.fingerprint_failed, read.message)
+                    runCatching { focus.requestFocus() }
+                }
             }
         }
+    }
+
+    LaunchedEffect(uri) {
+        val (reachable, wasInterrupted, enrolled) = withContext(Dispatchers.IO) {
+            val current = runCatching { VaultFile(context, uri).read() }.getOrNull()
+            Triple(
+                current != null,
+                VaultFile.Pending.interrupted(context, uri, current) && VaultFile.previous(context, uri) != null,
+                current != null && Fingerprint.enrolledFor(context, uri) && Fingerprint.available(context) is Fingerprint.Available.Yes,
+            )
+        }
+        interrupted = wasInterrupted
+        fingerprint = enrolled
+        // Said here, before any typing: a file whose app is gone fails the same way on every try.
+        if (!reachable) problem = context.getString(R.string.unlock_unreachable)
+        if (enrolled) unlockByFingerprint() else runCatching { focus.requestFocus() }
     }
 
     val pickOther = rememberVaultPicker(onOther)
@@ -172,6 +255,10 @@ fun UnlockScreen(
                     }
                     Spacer(Modifier.height(8.dp))
                     FootButton(stringResource(R.string.unlock), enabled = !busy) { unlock() }
+                    if (fingerprint) {
+                        Spacer(Modifier.height(10.dp))
+                        FootButton(stringResource(R.string.unlock_fingerprint), enabled = !busy) { unlockByFingerprint() }
+                    }
                 }
             }
             if (interrupted) {
@@ -268,4 +355,52 @@ internal fun PasswordField(
         },
         modifier = modifier.fillMaxWidth(),
     )
+}
+
+/**
+ * Fingerprint unlock turned on for [uri], with the vault open: the master password (and key
+ * file) go behind a fresh key-store key, after one reading at the phone's fingerprint sheet.
+ * [onDone] hears whether it is on now. Anything short of a full success leaves it off.
+ */
+internal fun enrolFingerprint(context: Context, uri: Uri, title: String, subtitle: String?, onDone: (Boolean) -> Unit) {
+    val secret = Session.secret()
+    if (secret == null) {
+        Notice.say(context.getString(R.string.fingerprint_cannot, "the vault is locked"))
+        onDone(false)
+        return
+    }
+    val cipher = try {
+        Fingerprint.cipherToEnrol(uri)
+    } catch (e: Exception) {
+        Fingerprint.forget(context)
+        Notice.say(context.getString(R.string.fingerprint_cannot, e.message ?: e.javaClass.simpleName))
+        onDone(false)
+        return
+    }
+    // The sheet is the phone's, not this app's; it must not count as leaving.
+    Locker.errand()
+    Fingerprint.prompt(context, title, subtitle, context.getString(R.string.fingerprint_not_now), cipher) { read ->
+        when (read) {
+            is Fingerprint.Read.Done -> {
+                val failed = runCatching { Fingerprint.enrol(context, uri, read.cipher, secret) }.exceptionOrNull()
+                if (failed == null) {
+                    Notice.say(context.getString(R.string.fingerprint_on))
+                    onDone(true)
+                } else {
+                    Fingerprint.forget(context)
+                    Notice.say(context.getString(R.string.fingerprint_cannot, failed.message ?: failed.javaClass.simpleName))
+                    onDone(false)
+                }
+            }
+            Fingerprint.Read.Cancelled -> {
+                Fingerprint.forget(context)
+                onDone(false)
+            }
+            is Fingerprint.Read.Failed -> {
+                Fingerprint.forget(context)
+                Notice.say(context.getString(R.string.fingerprint_cannot, read.message))
+                onDone(false)
+            }
+        }
+    }
 }

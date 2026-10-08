@@ -32,6 +32,7 @@ import com.mudita.mmd.components.switcher.SwitchMMD
 import com.wanderwildwood.aikotoba.Locker
 import com.wanderwildwood.aikotoba.Prefs
 import com.wanderwildwood.aikotoba.R
+import com.wanderwildwood.aikotoba.vault.Fingerprint
 import com.wanderwildwood.aikotoba.vault.Session
 import com.wanderwildwood.aikotoba.vault.VaultFile
 import kotlinx.coroutines.Dispatchers
@@ -55,14 +56,20 @@ fun SettingsScreen(
     var vibrate by remember { mutableStateOf(prefs.vibrateOnChange) }
     var fillOn by remember { mutableStateOf(false) }
     var hasPrevious by remember { mutableStateOf(false) }
+    var fingerprintOn by remember { mutableStateOf(Fingerprint.enrolledFor(context, open.uri)) }
+    var fingerprints by remember { mutableStateOf<Fingerprint.Available>(Fingerprint.Available.NoHardware) }
     val lifecycle = LocalLifecycleOwner.current
-    // Read again on every return, since the autofill choice is made in the system's settings.
+    // Read again on every return, since the autofill choice and the phone's fingerprints are
+    // both set in the system's settings.
     LaunchedEffect(Unit) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             fillOn = context.getSystemService(AutofillManager::class.java)?.hasEnabledAutofillServices() == true
+            fingerprints = Fingerprint.available(context)
             hasPrevious = withContext(Dispatchers.IO) { VaultFile.previous(context, open.uri) != null }
         }
     }
+    val enrolTitle = stringResource(R.string.fingerprint_enrol_title)
+    val enrolSubtitle = stringResource(R.string.fingerprint_enrol_subtitle)
     val pickOther = rememberVaultPicker(onOther)
     val copy = rememberFileMaker { uri -> actions.saveCopy(uri) }
 
@@ -117,6 +124,29 @@ fun SettingsScreen(
                 )
             }
             item { Say(stringResource(R.string.settings_lock_note)) }
+            item {
+                val can = fingerprints is Fingerprint.Available.Yes
+                PlainRow(
+                    title = stringResource(R.string.settings_fingerprint),
+                    note = when (val f = fingerprints) {
+                        Fingerprint.Available.Yes -> stringResource(R.string.settings_fingerprint_note)
+                        Fingerprint.Available.NoHardware -> stringResource(R.string.settings_fingerprint_no_hardware)
+                        Fingerprint.Available.NoneEnrolled -> stringResource(R.string.settings_fingerprint_none)
+                        is Fingerprint.Available.Other -> stringResource(R.string.settings_fingerprint_other, f.code)
+                    },
+                    noteLines = 5,
+                    trailing = { SwitchMMD(checked = fingerprintOn, onCheckedChange = null) },
+                    onPress = {
+                        if (fingerprintOn) {
+                            Fingerprint.forget(context)
+                            fingerprintOn = false
+                            Notice.say(context.getString(R.string.fingerprint_off))
+                        } else if (can) {
+                            enrolFingerprint(context, open.uri, enrolTitle, enrolSubtitle) { fingerprintOn = it }
+                        }
+                    },
+                )
+            }
 
             item { Heading(stringResource(R.string.settings_codes)) }
             item {

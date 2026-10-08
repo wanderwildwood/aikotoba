@@ -40,6 +40,13 @@
     <string name="key_file_add">Needs a key file too? Choose it</string>
     <string name="key_file_is">Key file: %1$s (press to remove)</string>
     <string name="key_file_unreadable">That key file could not be read.</string>
+    <string name="unlock_unreachable">The vault file cannot be reached. If it was moved, or the app that keeps it was removed, choose it again with Open a different vault.</string>
+    <string name="unlock_fingerprint">Unlock with fingerprint</string>
+    <string name="fingerprint_open_title">Open the vault</string>
+    <string name="fingerprint_use_password">Use the password</string>
+    <string name="fingerprint_changed">The phone\'s fingerprints have changed, so fingerprint unlock is off. Type the master password once, then turn it on again in Settings.</string>
+    <string name="fingerprint_password_changed">The master password has changed since fingerprint unlock was set up, so it is off. Type the new password once, then turn it on again in Settings.</string>
+    <string name="fingerprint_failed">The fingerprint sensor gave up: %1$s. The master password still opens the vault.</string>
     <string name="interrupted">The last save to this file may not have finished: the phone stopped part way. The copy from before that save is kept.</string>
     <string name="interrupted_put_back">Put back the copy from before</string>
     <string name="interrupted_leave">Leave the file as it is</string>
@@ -200,6 +207,20 @@
         <item quantity="other">After %1$s minutes</item>
     </plurals>
     <string name="settings_lock_note">It also locks whenever the screen goes dark.</string>
+    <string name="settings_fingerprint">Unlock with fingerprint</string>
+    <string name="settings_fingerprint_note">The master password is kept encrypted by a key in the phone\'s secure key store that only a registered finger can use. The phone destroys that key if its fingerprints change, and the password is asked for once again.</string>
+    <string name="settings_fingerprint_no_hardware">This phone has no fingerprint sensor that Android rates as secure.</string>
+    <string name="settings_fingerprint_none">No fingerprint is registered on this phone yet. Add one in the phone\'s own Settings, under Security.</string>
+    <string name="settings_fingerprint_other">The fingerprint sensor is not available right now (Android says %1$d).</string>
+    <string name="fingerprint_enrol_title">Unlock with fingerprint</string>
+    <string name="fingerprint_enrol_subtitle">One reading, to keep the master password behind it.</string>
+    <string name="fingerprint_keep_title">Keep fingerprint unlock</string>
+    <string name="fingerprint_keep_subtitle">The master password changed. One reading keeps the new one behind the fingerprint.</string>
+    <string name="fingerprint_not_now">Not now</string>
+    <string name="fingerprint_on">Fingerprint unlock is on.</string>
+    <string name="fingerprint_off">Fingerprint unlock is off.</string>
+    <string name="fingerprint_cannot">Fingerprint unlock could not be set up: %1$s</string>
+    <string name="fingerprint_off_password_changed">Fingerprint unlock is off: the master password changed. Settings can turn it on again.</string>
     <string name="settings_codes">Codes</string>
     <string name="settings_vibrate">Vibrate when codes change</string>
     <string name="settings_vibrate_note">A short tick each time the codes change, while they are on screen. It follows the phone\'s touch vibration setting.</string>
