@@ -53,7 +53,7 @@ fun EntryScreen(
         onBack = onBack,
         actions = { BarButton(Icons.Edit, stringResource(R.string.cd_edit), onEdit) },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize()) {
+        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
             if (item.username.isNotEmpty()) {
                 item {
                     val label = stringResource(R.string.label_username)

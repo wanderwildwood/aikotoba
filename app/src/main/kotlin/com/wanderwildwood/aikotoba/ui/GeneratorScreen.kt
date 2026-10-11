@@ -60,7 +60,7 @@ fun GeneratorScreen(prefs: Prefs, onBack: () -> Unit, onUse: ((String) -> Unit)?
         onBack = onBack,
         actions = { if (onUse != null) BarWord(stringResource(R.string.gen_use), ready = value.isNotEmpty()) { onUse(value) } },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize()) {
+        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
             item {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                     TextMMD(text = value, style = MaterialTheme.typography.titleMedium, fontFamily = FontFamily.Monospace)

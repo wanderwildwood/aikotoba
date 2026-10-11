@@ -74,7 +74,7 @@ fun SettingsScreen(
     val copy = rememberFileMaker { uri -> actions.saveCopy(uri) }
 
     Frame(title = stringResource(R.string.settings_title), onBack = onBack) {
-        LazyColumnMMD(Modifier.fillMaxSize()) {
+        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
             item { Heading(stringResource(R.string.settings_vault)) }
             item {
                 PlainRow(
@@ -230,7 +230,7 @@ fun ChangePasswordScreen(onBack: () -> Unit, onChange: (String) -> Unit) {
         if (problem == null) onChange(first)
     }
     Frame(title = stringResource(R.string.settings_password), onBack = onBack, backIcon = Icons.Close) {
-        LazyColumnMMD(Modifier.fillMaxSize()) {
+        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
             item { Say(stringResource(R.string.password_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {

@@ -58,7 +58,7 @@ fun EditScreen(route: Route.Edit, onClose: () -> Unit, onSave: (com.wanderwildwo
             }
         },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize()) {
+        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
             item { Field(stringResource(R.string.label_title), draft.title, { draft = draft.copy(title = it) }, KeyboardCapitalization.Sentences) }
             item {
                 Field(stringResource(R.string.label_username), draft.username, { draft = draft.copy(username = it) }, KeyboardCapitalization.None, KeyboardType.Email)

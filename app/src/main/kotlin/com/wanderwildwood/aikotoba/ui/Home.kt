@@ -199,7 +199,7 @@ private fun Choice(label: String, chosen: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun EntryList(items: List<Item>, onEntry: (UUID) -> Unit, empty: String?) {
-    LazyColumnMMD(Modifier.fillMaxSize()) {
+    LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
         if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
         for (item in items) {
             item(key = item.uuid.toString()) {
@@ -263,7 +263,7 @@ internal fun rememberNow(): Long {
 private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinned: Int?, vibrate: Boolean, empty: String?) {
     val context = LocalContext.current
     TickOnChange(vibrate, items.mapNotNull { it.otp }.filter { !it.isCounter }.map { it.period }.distinct().sorted())
-    LazyColumnMMD(Modifier.fillMaxSize()) {
+    LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
         if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
         if (items.any { it.otp != null }) {
             item(key = "hint") {

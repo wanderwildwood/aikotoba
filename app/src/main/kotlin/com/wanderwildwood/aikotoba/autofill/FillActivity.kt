@@ -128,7 +128,7 @@ private fun Pick(open: Session.Open, fields: Fields, site: String?, asking: Stri
             trailingIcon = { if (query.isNotEmpty()) BarButton(Icons.Close, stringResource(R.string.cd_clear)) { query = "" } },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         )
-        LazyColumnMMD(Modifier.fillMaxSize()) {
+        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
             if (site == null) {
                 item {
                     PlainRow(

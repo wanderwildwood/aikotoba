@@ -55,7 +55,7 @@ fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: () -> Un
         title = stringResource(R.string.app_name),
         actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
-        LazyColumnMMD(Modifier.fillMaxWidth()) {
+        LazyColumnMMD(Modifier.fillMaxWidth(), isScrollbarVisible = false) {
             item { Say(stringResource(R.string.start_what), Modifier.padding(top = 8.dp)) }
             item { Say(stringResource(R.string.start_file)) }
             item {
@@ -218,7 +218,7 @@ fun UnlockScreen(
         title = stringResource(R.string.app_name),
         actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
-        LazyColumnMMD(Modifier.fillMaxWidth()) {
+        LazyColumnMMD(Modifier.fillMaxWidth(), isScrollbarVisible = false) {
             item {
                 Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
                     TextMMD(text = name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
@@ -313,7 +313,7 @@ fun CreateScreen(busy: Boolean, onCreate: (String) -> Unit, onCancel: () -> Unit
     }
 
     Frame(title = stringResource(R.string.create_title), onBack = onCancel, backIcon = Icons.Close) {
-        LazyColumnMMD(Modifier.fillMaxWidth()) {
+        LazyColumnMMD(Modifier.fillMaxWidth(), isScrollbarVisible = false) {
             item { Say(stringResource(R.string.create_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {
