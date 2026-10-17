@@ -40,11 +40,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.FloatingActionButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
+import androidx.compose.foundation.lazy.rememberLazyListState
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.ok1cdj.kauth.core.Otp
@@ -130,13 +130,11 @@ fun HomeScreen(
             )
             HorizontalDividerMMD()
         }
-        // The search lives on the same line as Codes and All, so the list keeps every row it had:
-        // the magnifier opens a field beside them, and what is typed narrows the list at once.
-        // This line stays while the list scrolls, so the seconds until the codes change sit
-        // here, before the magnifier, and are in view from the foot of a long list too.
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp, top = 4.dp)) {
-            Choice(stringResource(R.string.home_codes), codes) { codes = true; prefs.showCodes = true }
-            Choice(stringResource(R.string.home_all), !codes) { codes = false; prefs.showCodes = false }
+        StoneTabs(listOf(stringResource(R.string.home_codes), stringResource(R.string.home_all)), if (codes) 0 else 1, { codes = it == 0; prefs.showCodes = codes })
+        // Under the tabs, a line that stays while the list scrolls: the seconds until the codes
+        // change, in view from the foot of a long list too, and the magnifier, which opens the
+        // search in place there and narrows the list as it is typed.
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(start = 8.dp, end = 4.dp)) {
             if (searching) {
                 SearchField(query, { query = it }, Modifier.weight(1f).padding(start = 8.dp))
                 BarButton(Icons.Close, stringResource(R.string.cd_close_search)) { searching = false; query = "" }
@@ -187,28 +185,21 @@ private fun SearchField(query: String, onQuery: (String) -> Unit, modifier: Modi
 }
 
 @Composable
-private fun Choice(label: String, chosen: Boolean, onClick: () -> Unit) {
-    TextMMD(
-        text = label,
-        style = MaterialTheme.typography.bodyLarge,
-        fontWeight = if (chosen) FontWeight.Bold else null,
-        textDecoration = if (chosen) TextDecoration.Underline else null,
-        modifier = Modifier.clickable(onClick = onClick).padding(horizontal = 8.dp, vertical = 10.dp),
-    )
-}
-
-@Composable
 private fun EntryList(items: List<Item>, onEntry: (UUID) -> Unit, empty: String?) {
-    LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
-        if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
-        for (item in items) {
-            item(key = item.uuid.toString()) {
-                PlainRow(
-                    title = item.label,
-                    note = listOf(item.username, item.group).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
-                    noteLines = 1,
-                    onPress = { onEntry(item.uuid) },
-                )
+    val state = rememberLazyListState()
+    val jump = remember(items, empty) { ListJump.Letters(items.map { it.label }, firstIndex = if (empty != null) 1 else 0) }
+    ListJumpBox(state, jump, clearBelow = FAB_ROOM) {
+        LazyColumnMMD(Modifier.fillMaxSize(), state = state, isScrollbarVisible = false) {
+            if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
+            for (item in items) {
+                item(key = item.uuid.toString()) {
+                    PlainRow(
+                        title = item.label,
+                        note = listOf(item.username, item.group).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
+                        noteLines = 1,
+                        onPress = { onEntry(item.uuid) },
+                    )
+                }
             }
         }
     }
@@ -263,59 +254,69 @@ internal fun rememberNow(): Long {
 private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinned: Int?, vibrate: Boolean, empty: String?) {
     val context = LocalContext.current
     TickOnChange(vibrate, items.mapNotNull { it.otp }.filter { !it.isCounter }.map { it.period }.distinct().sorted())
-    LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
-        if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
-        if (items.any { it.otp != null }) {
-            item(key = "hint") {
-                TextMMD(
-                    text = stringResource(R.string.codes_press_to_copy),
-                    style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
-                )
-            }
-        }
-        for (item in items) {
-            val spec = item.otp ?: continue
-            item(key = item.uuid.toString()) {
-                val code = remember(spec, if (spec.isCounter) 0L else now / 1000 / spec.period) {
-                    runCatching { OtpField.code(spec, now) }.getOrNull()
+    val state = rememberLazyListState()
+    val jump = remember(items, empty) {
+        val named = items.filter { it.otp != null }.map { it.label }
+        ListJump.Letters(named, firstIndex = (if (empty != null) 1 else 0) + (if (named.isNotEmpty()) 1 else 0))
+    }
+    ListJumpBox(state, jump, clearBelow = FAB_ROOM) {
+        LazyColumnMMD(Modifier.fillMaxSize(), state = state, isScrollbarVisible = false) {
+            if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
+            if (items.any { it.otp != null }) {
+                item(key = "hint") {
+                    TextMMD(
+                        text = stringResource(R.string.codes_press_to_copy),
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+                    )
                 }
-                val copyLabel = stringResource(R.string.label_code)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .combinedClickable(
-                            onClick = { if (code != null) Clipboard.copy(context, copyLabel, code) },
-                            onLongClick = { onEntry(item.uuid) },
-                        )
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        TextMMD(text = item.label, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        val note = item.username.ifBlank { spec.account.name }
-                        if (note.isNotBlank() && note != item.label) {
-                            TextMMD(text = note, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+            for (item in items) {
+                val spec = item.otp ?: continue
+                item(key = item.uuid.toString()) {
+                    val code = remember(spec, if (spec.isCounter) 0L else now / 1000 / spec.period) {
+                        runCatching { OtpField.code(spec, now) }.getOrNull()
+                    }
+                    val copyLabel = stringResource(R.string.label_code)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .combinedClickable(
+                                onClick = { if (code != null) Clipboard.copy(context, copyLabel, code) },
+                                onLongClick = { onEntry(item.uuid) },
+                            )
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            TextMMD(text = item.label, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            val note = item.username.ifBlank { spec.account.name }
+                            if (note.isNotBlank() && note != item.label) {
+                                TextMMD(text = note, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                        }
+                        Spacer(Modifier.width(8.dp))
+                        Column(horizontalAlignment = Alignment.End) {
+                            TextMMD(
+                                text = code?.let(OtpField::spaced) ?: stringResource(R.string.code_unreadable),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            val own = when {
+                                spec.isCounter -> stringResource(R.string.code_counter)
+                                spec.period != pinned -> stringResource(R.string.code_seconds, Otp.secondsRemaining(spec.period, now).toString())
+                                else -> null
+                            }
+                            if (own != null) TextMMD(text = own, style = MaterialTheme.typography.labelSmall)
                         }
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Column(horizontalAlignment = Alignment.End) {
-                        TextMMD(
-                            text = code?.let(OtpField::spaced) ?: stringResource(R.string.code_unreadable),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        val own = when {
-                            spec.isCounter -> stringResource(R.string.code_counter)
-                            spec.period != pinned -> stringResource(R.string.code_seconds, Otp.secondsRemaining(spec.period, now).toString())
-                            else -> null
-                        }
-                        if (own != null) TextMMD(text = own, style = MaterialTheme.typography.labelSmall)
-                    }
+                    DottedRule()
                 }
-                DottedRule()
             }
+            item(key = "foot") { Spacer(Modifier.padding(bottom = FAB_ROOM)) }
         }
-        item(key = "foot") { Spacer(Modifier.padding(bottom = 72.dp)) }
     }
 }
+
+/** The new-entry button floating over the foot of either list; the letters stop above it. */
+private val FAB_ROOM = 72.dp

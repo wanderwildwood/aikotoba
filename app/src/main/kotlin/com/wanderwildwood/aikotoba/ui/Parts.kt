@@ -61,11 +61,10 @@ internal fun BarWord(text: String, ready: Boolean = true, onClick: () -> Unit) {
     )
 }
 
-/** A top bar's title, in bold as the phone's own apps set it. */
+/** A top bar's title, in the bar's own type: never bolded or resized here. */
 @Composable
 internal fun BarTitle(text: String) {
-    // Black, not Bold: the phone's own titles measure a 5px stem at this size, Bold a 4px one.
-    TextMMD(text = text, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    TextMMD(text = text, maxLines = 1, overflow = TextOverflow.Ellipsis)
 }
 
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
@@ -76,20 +75,16 @@ internal fun Bar(
     backIcon: ImageVector = Icons.Back,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
-    Column {
-        TopAppBarMMD(
-            title = { BarTitle(title) },
-            navigationIcon = {
-                if (onBack != null) {
-                    val says = if (backIcon == Icons.Close) com.wanderwildwood.aikotoba.R.string.cd_close else com.wanderwildwood.aikotoba.R.string.cd_back
-                    BarButton(backIcon, androidx.compose.ui.res.stringResource(says), onBack)
-                }
-            },
-            actions = actions,
-            showDivider = false,
-        )
-        HorizontalDividerMMD(thickness = 3.dp, color = MaterialTheme.colorScheme.onSurface)
-    }
+    TopAppBarMMD(
+        title = { BarTitle(title) },
+        navigationIcon = {
+            if (onBack != null) {
+                val says = if (backIcon == Icons.Close) com.wanderwildwood.aikotoba.R.string.cd_close else com.wanderwildwood.aikotoba.R.string.cd_back
+                BarButton(backIcon, androidx.compose.ui.res.stringResource(says), onBack)
+            }
+        },
+        actions = actions,
+    )
 }
 
 /**
