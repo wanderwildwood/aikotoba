@@ -12,6 +12,8 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <queries>
+        <!-- DuraSpeed, the Kompakt's background manager: only to say whether it is there. -->
+        <package android:name="com.mediatek.duraspeed" />
         <!-- The apps that keep files (Files, a Nextcloud app, Syncthing): the vault lives in one of
              them. Without this, from Android 11 on, the right to a file picked through one of them
              outlives the app's own ability to see that app: an update of Passwords left a vault on

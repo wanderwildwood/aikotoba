@@ -2,7 +2,6 @@ package com.wanderwildwood.aikotoba.ui
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings as AndroidSettings
 import android.view.autofill.AutofillManager
 import androidx.compose.foundation.layout.Column
@@ -57,6 +56,9 @@ fun SettingsScreen(
     var hasPrevious by remember { mutableStateOf(false) }
     var fingerprintOn by remember { mutableStateOf(Fingerprint.enrolledFor(context, open.uri)) }
     var fingerprints by remember { mutableStateOf<Fingerprint.Available>(Fingerprint.Available.NoHardware) }
+    val duraSpeedPresent = remember {
+        runCatching { context.packageManager.getApplicationInfo("com.mediatek.duraspeed", 0); true }.getOrDefault(false)
+    }
     val lifecycle = LocalLifecycleOwner.current
     // Read again on every return, since the autofill choice and the phone's fingerprints are
     // both set in the system's settings.
@@ -192,7 +194,8 @@ fun SettingsScreen(
                     onPress = { rememberApp = !rememberApp; prefs.rememberForApp = rememberApp },
                 )
             }
-            if (Build.MANUFACTURER.equals("Mudita", ignoreCase = true)) {
+            // DuraSpeed itself, not the maker's name: a Kompakt on KompaktOS says Mudita and has none.
+            if (duraSpeedPresent) {
                 item {
                     PlainRow(
                         title = stringResource(R.string.settings_duraspeed),
