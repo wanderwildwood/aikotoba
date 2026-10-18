@@ -157,6 +157,14 @@ fun SettingsScreen(
                     onPress = { vibrate = !vibrate; prefs.vibrateOnChange = vibrate },
                 )
             }
+            item {
+                val jumpShown by rememberListJumpShown()
+                PlainRow(
+                    title = stringResource(R.string.list_jump_setting),
+                    trailing = { SwitchMMD(checked = jumpShown, onCheckedChange = null) },
+                    onPress = { ListJumpPrefs.setShown(context, !jumpShown) },
+                )
+            }
 
             item { Heading(stringResource(R.string.settings_other_apps)) }
             item {
