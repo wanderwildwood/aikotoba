@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.FloatingActionButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import androidx.compose.foundation.lazy.rememberLazyListState
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.ok1cdj.kauth.core.Otp
 import com.wanderwildwood.aikotoba.Clipboard
@@ -189,7 +188,7 @@ private fun EntryList(items: List<Item>, onEntry: (UUID) -> Unit, empty: String?
     val state = rememberLazyListState()
     val jump = remember(items, empty) { ListJump.Letters(items.map { it.label }, firstIndex = if (empty != null) 1 else 0) }
     ListJumpBox(state, jump, clearBelow = FAB_ROOM) {
-        LazyColumnMMD(Modifier.fillMaxSize(), state = state, isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize(), state = state) {
             if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
             for (item in items) {
                 item(key = item.uuid.toString()) {
@@ -260,7 +259,7 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinn
         ListJump.Letters(named, firstIndex = (if (empty != null) 1 else 0) + (if (named.isNotEmpty()) 1 else 0))
     }
     ListJumpBox(state, jump, clearBelow = FAB_ROOM) {
-        LazyColumnMMD(Modifier.fillMaxSize(), state = state, isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize(), state = state) {
             if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
             if (items.any { it.otp != null }) {
                 item(key = "hint") {
@@ -313,7 +312,6 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinn
                     DottedRule()
                 }
             }
-            item(key = "foot") { Spacer(Modifier.padding(bottom = FAB_ROOM)) }
         }
     }
 }

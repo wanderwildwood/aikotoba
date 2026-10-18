@@ -29,7 +29,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.caravanfire.calmqr.QrScanner
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.ok1cdj.kauth.core.Base32
@@ -103,7 +102,7 @@ fun AddCodeScreen(
     }
 
     Frame(title = stringResource(if (attaching) R.string.add_code_title else R.string.add_codes_title), onBack = onBack) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             if (reading) item { Say(stringResource(R.string.add_code_reading), bold = true) }
             item {
                 PlainRow(stringResource(R.string.add_code_camera), stringResource(R.string.add_code_camera_note)) {
@@ -201,7 +200,7 @@ private fun TypeSecret(issuer: String, account: String, onBack: () -> Unit, onDo
             }
         },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             item { Line(stringResource(R.string.type_issuer), name) { name = it } }
             item { Line(stringResource(R.string.type_account), user) { user = it } }
             item { Line(stringResource(R.string.type_secret), secret, KeyboardCapitalization.Characters) { secret = it } }

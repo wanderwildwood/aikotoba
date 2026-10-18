@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.ok1cdj.kauth.core.Otp
 import com.wanderwildwood.aikotoba.Clipboard
@@ -53,7 +52,7 @@ fun EntryScreen(
         onBack = onBack,
         actions = { BarButton(Icons.Edit, stringResource(R.string.cd_edit), onEdit) },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             if (item.username.isNotEmpty()) {
                 item {
                     val label = stringResource(R.string.label_username)

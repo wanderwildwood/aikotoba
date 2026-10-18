@@ -1,5 +1,6 @@
 package com.wanderwildwood.aikotoba.autofill
 
+import com.wanderwildwood.aikotoba.ui.PagedColumn
 import android.app.assist.AssistStructure
 import android.content.Intent
 import android.os.Bundle
@@ -25,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import app.keemobile.kotpass.database.modifiers.modifyEntry
 import app.keemobile.kotpass.models.EntryValue
 import com.mudita.mmd.ThemeMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
@@ -128,7 +128,7 @@ private fun Pick(open: Session.Open, fields: Fields, site: String?, asking: Stri
             trailingIcon = { if (query.isNotEmpty()) BarButton(Icons.Close, stringResource(R.string.cd_clear)) { query = "" } },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         )
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             if (site == null) {
                 item {
                     PlainRow(

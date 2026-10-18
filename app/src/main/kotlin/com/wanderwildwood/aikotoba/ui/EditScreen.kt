@@ -25,7 +25,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.wanderwildwood.aikotoba.R
@@ -58,7 +57,7 @@ fun EditScreen(route: Route.Edit, onClose: () -> Unit, onSave: (com.wanderwildwo
             }
         },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             item { Field(stringResource(R.string.label_title), draft.title, { draft = draft.copy(title = it) }, KeyboardCapitalization.Sentences) }
             item {
                 Field(stringResource(R.string.label_username), draft.username, { draft = draft.copy(username = it) }, KeyboardCapitalization.None, KeyboardType.Email)
@@ -122,7 +121,6 @@ fun EditScreen(route: Route.Edit, onClose: () -> Unit, onSave: (com.wanderwildwo
                     )
                 }
             }
-            item { Spacer(Modifier.height(240.dp)) }
         }
     }
 }

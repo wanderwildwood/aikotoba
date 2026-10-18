@@ -27,7 +27,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
 import com.wanderwildwood.aikotoba.Locker
 import com.wanderwildwood.aikotoba.Prefs
@@ -74,7 +73,7 @@ fun SettingsScreen(
     val copy = rememberFileMaker { uri -> actions.saveCopy(uri) }
 
     Frame(title = stringResource(R.string.settings_title), onBack = onBack) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             item { Heading(stringResource(R.string.settings_vault)) }
             item {
                 PlainRow(
@@ -230,7 +229,7 @@ fun ChangePasswordScreen(onBack: () -> Unit, onChange: (String) -> Unit) {
         if (problem == null) onChange(first)
     }
     Frame(title = stringResource(R.string.settings_password), onBack = onBack, backIcon = Icons.Close) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             item { Say(stringResource(R.string.password_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {

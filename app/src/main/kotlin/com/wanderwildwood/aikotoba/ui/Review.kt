@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.checkbox.CheckboxMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.ok1cdj.kauth.core.WrongPasswordException
 import com.wanderwildwood.aikotoba.R
 import com.wanderwildwood.aikotoba.importer.Found
@@ -47,7 +46,7 @@ fun ReviewScreen(found: Found, existing: List<OtpSpec>, onBack: () -> Unit, onAd
         onBack = onBack,
         actions = { BarWord(stringResource(R.string.review_add), ready = count > 0) { onAdd(found.codes.filterIndexed { i, _ -> chosen[i] }) } },
     ) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             if (found.fromGoogle) item { Say(stringResource(R.string.import_google), bold = true) }
             if (found.codes.isEmpty()) item { Say(stringResource(R.string.import_nothing)) }
             found.codes.forEachIndexed { i, spec ->
@@ -65,7 +64,7 @@ fun ReviewScreen(found: Found, existing: List<OtpSpec>, onBack: () -> Unit, onAd
                     PlainRow(
                         title = Import.title(spec),
                         note = note.ifBlank { null },
-                        trailing = { CheckboxMMD(checked = chosen[i], onCheckedChange = null) },
+                        trailing = { CheckboxMMD(checked = chosen[i], onCheckedChange = { chosen[i] = it }) },
                         onPress = { chosen[i] = !chosen[i] },
                     )
                 }
@@ -125,7 +124,7 @@ fun KauthScreen(blob: String, onBack: () -> Unit, onOpened: (Found) -> Unit) {
     }
 
     Frame(title = stringResource(R.string.kauth_title), onBack = onBack) {
-        LazyColumnMMD(Modifier.fillMaxSize(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxSize()) {
             item { Say(stringResource(R.string.kauth_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {

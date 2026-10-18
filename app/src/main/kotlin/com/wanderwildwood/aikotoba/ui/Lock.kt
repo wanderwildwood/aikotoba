@@ -33,7 +33,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.wanderwildwood.aikotoba.Locker
@@ -55,7 +54,7 @@ fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: () -> Un
         title = stringResource(R.string.app_name),
         actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
-        LazyColumnMMD(Modifier.fillMaxWidth(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxWidth()) {
             item { Say(stringResource(R.string.start_what), Modifier.padding(top = 8.dp)) }
             item { Say(stringResource(R.string.start_file)) }
             item {
@@ -218,7 +217,7 @@ fun UnlockScreen(
         title = stringResource(R.string.app_name),
         actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
-        LazyColumnMMD(Modifier.fillMaxWidth(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxWidth()) {
             item {
                 Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
                     TextMMD(text = name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
@@ -313,7 +312,7 @@ fun CreateScreen(busy: Boolean, onCreate: (String) -> Unit, onCancel: () -> Unit
     }
 
     Frame(title = stringResource(R.string.create_title), onBack = onCancel, backIcon = Icons.Close) {
-        LazyColumnMMD(Modifier.fillMaxWidth(), isScrollbarVisible = false) {
+        PagedColumn(Modifier.fillMaxWidth()) {
             item { Say(stringResource(R.string.create_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {
