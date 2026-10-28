@@ -186,19 +186,16 @@ private fun SearchField(query: String, onQuery: (String) -> Unit, modifier: Modi
 @Composable
 private fun EntryList(items: List<Item>, onEntry: (UUID) -> Unit, empty: String?) {
     val state = rememberLazyListState()
-    val jump = remember(items, empty) { ListJump.Letters(items.map { it.label }, firstIndex = if (empty != null) 1 else 0) }
-    ListJumpBox(state, jump, clearBelow = FAB_ROOM) {
-        PagedColumn(Modifier.fillMaxSize(), state = state) {
-            if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
-            for (item in items) {
-                item(key = item.uuid.toString()) {
-                    PlainRow(
-                        title = item.label,
-                        note = listOf(item.username, item.group).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
-                        noteLines = 1,
-                        onPress = { onEntry(item.uuid) },
-                    )
-                }
+    PagedColumn(Modifier.fillMaxSize(), state = state) {
+        if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
+        for (item in items) {
+            item(key = item.uuid.toString()) {
+                PlainRow(
+                    title = item.label,
+                    note = listOf(item.username, item.group).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
+                    noteLines = 1,
+                    onPress = { onEntry(item.uuid) },
+                )
             }
         }
     }
@@ -254,67 +251,58 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinn
     val context = LocalContext.current
     TickOnChange(vibrate, items.mapNotNull { it.otp }.filter { !it.isCounter }.map { it.period }.distinct().sorted())
     val state = rememberLazyListState()
-    val jump = remember(items, empty) {
-        val named = items.filter { it.otp != null }.map { it.label }
-        ListJump.Letters(named, firstIndex = (if (empty != null) 1 else 0) + (if (named.isNotEmpty()) 1 else 0))
-    }
-    ListJumpBox(state, jump, clearBelow = FAB_ROOM) {
-        PagedColumn(Modifier.fillMaxSize(), state = state) {
-            if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
-            if (items.any { it.otp != null }) {
-                item(key = "hint") {
-                    TextMMD(
-                        text = stringResource(R.string.codes_press_to_copy),
-                        style = MaterialTheme.typography.labelSmall,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
-                    )
-                }
+    PagedColumn(Modifier.fillMaxSize(), state = state) {
+        if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
+        if (items.any { it.otp != null }) {
+            item(key = "hint") {
+                TextMMD(
+                    text = stringResource(R.string.codes_press_to_copy),
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+                )
             }
-            for (item in items) {
-                val spec = item.otp ?: continue
-                item(key = item.uuid.toString()) {
-                    val code = remember(spec, if (spec.isCounter) 0L else now / 1000 / spec.period) {
-                        runCatching { OtpField.code(spec, now) }.getOrNull()
-                    }
-                    val copyLabel = stringResource(R.string.label_code)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .combinedClickable(
-                                onClick = { if (code != null) Clipboard.copy(context, copyLabel, code) },
-                                onLongClick = { onEntry(item.uuid) },
-                            )
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            TextMMD(text = item.label, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            val note = item.username.ifBlank { spec.account.name }
-                            if (note.isNotBlank() && note != item.label) {
-                                TextMMD(text = note, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            }
-                        }
-                        Spacer(Modifier.width(8.dp))
-                        Column(horizontalAlignment = Alignment.End) {
-                            TextMMD(
-                                text = code?.let(OtpField::spaced) ?: stringResource(R.string.code_unreadable),
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            val own = when {
-                                spec.isCounter -> stringResource(R.string.code_counter)
-                                spec.period != pinned -> stringResource(R.string.code_seconds, Otp.secondsRemaining(spec.period, now).toString())
-                                else -> null
-                            }
-                            if (own != null) TextMMD(text = own, style = MaterialTheme.typography.labelSmall)
-                        }
-                    }
-                    DottedRule()
+        }
+        for (item in items) {
+            val spec = item.otp ?: continue
+            item(key = item.uuid.toString()) {
+                val code = remember(spec, if (spec.isCounter) 0L else now / 1000 / spec.period) {
+                    runCatching { OtpField.code(spec, now) }.getOrNull()
                 }
+                val copyLabel = stringResource(R.string.label_code)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .combinedClickable(
+                            onClick = { if (code != null) Clipboard.copy(context, copyLabel, code) },
+                            onLongClick = { onEntry(item.uuid) },
+                        )
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                ) {
+                    Column(Modifier.weight(1f)) {
+                        TextMMD(text = item.label, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        val note = item.username.ifBlank { spec.account.name }
+                        if (note.isNotBlank() && note != item.label) {
+                            TextMMD(text = note, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Column(horizontalAlignment = Alignment.End) {
+                        TextMMD(
+                            text = code?.let(OtpField::spaced) ?: stringResource(R.string.code_unreadable),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        val own = when {
+                            spec.isCounter -> stringResource(R.string.code_counter)
+                            spec.period != pinned -> stringResource(R.string.code_seconds, Otp.secondsRemaining(spec.period, now).toString())
+                            else -> null
+                        }
+                        if (own != null) TextMMD(text = own, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+                DottedRule()
             }
         }
     }
 }
-
-/** The new-entry button floating over the foot of either list; the letters stop above it. */
-private val FAB_ROOM = 72.dp
