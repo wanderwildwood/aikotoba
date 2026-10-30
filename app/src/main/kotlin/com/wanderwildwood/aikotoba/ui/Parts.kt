@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -23,8 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -175,7 +174,7 @@ internal fun PlainRow(
         }
         trailing?.let { Box(Modifier.padding(start = 16.dp)) { it() } }
     }
-    if (rule) DottedRule()
+    if (rule) RowGap()
 }
 
 /** A button along the foot of a screen or in a dialog. */
@@ -206,24 +205,10 @@ internal fun NoticeStrip(text: String, onSeen: () -> Unit) {
     )
 }
 
-/** The rule between rows: dotted, as the phone's own lists draw it. */
+/** The gap between rows: lists draw no rules (STYLE.md), rows are set apart by space. */
 @Composable
-internal fun DottedRule(modifier: Modifier = Modifier) {
-    val ink = MaterialTheme.colorScheme.onSurface
-    androidx.compose.foundation.Canvas(
-        modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .height(1.dp),
-    ) {
-        drawLine(
-            color = ink,
-            start = Offset(0f, size.height / 2),
-            end = Offset(size.width, size.height / 2),
-            strokeWidth = 1.dp.toPx().coerceAtMost(1.5f),
-            pathEffect = PathEffect.dashPathEffect(floatArrayOf(2.3.dp.toPx(), 1.5.dp.toPx())),
-        )
-    }
+internal fun RowGap(modifier: Modifier = Modifier) {
+    Spacer(modifier.fillMaxWidth().height(12.dp))
 }
 
 /** A sentence on its own, in the body of a screen. */

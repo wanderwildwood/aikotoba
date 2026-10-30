@@ -107,7 +107,7 @@ fun EditScreen(route: Route.Edit, onClose: () -> Unit, onSave: (com.wanderwildwo
                         }
                     }
                 }
-                DottedRule()
+                RowGap()
             }
             item {
                 Column(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {

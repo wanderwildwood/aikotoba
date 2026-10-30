@@ -301,7 +301,7 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinn
                         if (own != null) TextMMD(text = own, style = MaterialTheme.typography.labelSmall)
                     }
                 }
-                DottedRule()
+                RowGap()
             }
         }
     }

@@ -73,7 +73,7 @@ fun EntryScreen(
                         BarButton(if (shown) Icons.VisibilityOff else Icons.Visibility, stringResource(if (shown) R.string.cd_hide else R.string.cd_show)) { shown = !shown }
                         BarButton(Icons.Copy, stringResource(R.string.cd_copy)) { Clipboard.copy(context, label, password()) }
                     }
-                    DottedRule()
+                    RowGap()
                 }
             }
             item.otp?.let { spec ->
@@ -103,7 +103,7 @@ fun EntryScreen(
                     if (spec.isCounter) {
                         Column(Modifier.padding(horizontal = 16.dp)) { FootButton(stringResource(R.string.code_next)) { onNextCode(spec) } }
                     }
-                    DottedRule()
+                    RowGap()
                 }
             }
             if (item.url.isNotEmpty()) {
@@ -121,7 +121,7 @@ fun EntryScreen(
                         TextMMD(text = stringResource(R.string.label_notes), style = MaterialTheme.typography.labelSmall)
                         SelectionContainer { TextMMD(text = item.notes, style = MaterialTheme.typography.bodyMedium) }
                     }
-                    DottedRule()
+                    RowGap()
                 }
             }
             if (item.group.isNotEmpty()) {
@@ -150,5 +150,5 @@ private fun ValueRow(label: String, value: String, icon: androidx.compose.ui.gra
         }
         BarButton(icon, description, onPress)
     }
-    DottedRule()
+    RowGap()
 }
