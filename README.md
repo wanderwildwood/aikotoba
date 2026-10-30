@@ -3,7 +3,8 @@
 Sign-ins and their two-step codes, kept in a KeePass file. Open the file with your master
 password, copy a password or a code, or let other apps fill their sign-in screens from it. Built
 for the [Mudita Kompakt](https://mudita.com/products/kompakt/), and it will install on any
-Android 12 device.
+Android 12 device. It has no internet permission: the file is the only copy, so a copy of it is
+the backup.
 
 *Aikotoba* is 合言葉 — a watchword, the word that lets you through.
 
