@@ -89,24 +89,24 @@ fun GeneratorScreen(prefs: Prefs, onBack: () -> Unit, onUse: ((String) -> Unit)?
                         }
                     }
                 }
-                DottedRule()
+                Spacer(Modifier.height(8.dp))
             }
             item {
-                PlainRow(stringResource(R.string.gen_kind), stringResource(if (words) R.string.gen_kind_words else R.string.gen_kind_chars)) {
+                SettingsRow(stringResource(R.string.gen_kind), stringResource(if (words) R.string.gen_kind_words else R.string.gen_kind_chars)) {
                     words = !words
                     prefs.genWords = words
                 }
             }
             if (words) {
                 item {
-                    PlainRow(stringResource(R.string.gen_words), count.toString()) {
+                    SettingsRow(stringResource(R.string.gen_words), count.toString()) {
                         count = if (count >= 10) 4 else count + 1
                         prefs.genWordCount = count
                     }
                 }
                 item {
                     val names = mapOf("-" to R.string.gen_sep_dash, " " to R.string.gen_sep_space, "." to R.string.gen_sep_dot, "_" to R.string.gen_sep_underscore, "" to R.string.gen_sep_none)
-                    PlainRow(stringResource(R.string.gen_separator), stringResource(names[separator] ?: R.string.gen_sep_dash)) {
+                    SettingsRow(stringResource(R.string.gen_separator), stringResource(names[separator] ?: R.string.gen_sep_dash)) {
                         val keys = names.keys.toList()
                         separator = keys[(keys.indexOf(separator) + 1) % keys.size]
                         prefs.genSeparator = separator
@@ -115,7 +115,7 @@ fun GeneratorScreen(prefs: Prefs, onBack: () -> Unit, onUse: ((String) -> Unit)?
                 item { Say(stringResource(R.string.gen_words_note)) }
             } else {
                 item {
-                    PlainRow(stringResource(R.string.gen_length), chars.length.toString()) {
+                    SettingsRow(stringResource(R.string.gen_length), chars.length.toString()) {
                         val steps = listOf(12, 16, 20, 24, 32, 40, 64)
                         setChars(chars.copy(length = steps.firstOrNull { it > chars.length } ?: steps.first()))
                     }
@@ -132,5 +132,5 @@ fun GeneratorScreen(prefs: Prefs, onBack: () -> Unit, onUse: ((String) -> Unit)?
 
 @Composable
 private fun Toggle(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
-    PlainRow(title = label, trailing = { SwitchMMD(checked = on, onCheckedChange = null) }, onPress = { onChange(!on) })
+    SettingsRow(title = label, trailing = { SwitchMMD(checked = on, onCheckedChange = null) }, onPress = { onChange(!on) })
 }

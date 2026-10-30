@@ -76,9 +76,9 @@ fun SettingsScreen(
 
     Frame(title = stringResource(R.string.settings_title), onBack = onBack) {
         PagedColumn(Modifier.fillMaxSize()) {
-            item { Heading(stringResource(R.string.settings_vault)) }
+            item { SettingsHeading(stringResource(R.string.settings_vault)) }
             item {
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_file),
                     note = if (open.writable) open.name else stringResource(R.string.settings_file_read_only, open.name),
                     noteLines = 3,
@@ -86,7 +86,7 @@ fun SettingsScreen(
                 )
             }
             item {
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_copy),
                     note = stringResource(R.string.settings_copy_note),
                     noteLines = 4,
@@ -96,7 +96,7 @@ fun SettingsScreen(
             if (hasPrevious) {
                 item {
                     val (armed, press) = rememberArmed("previous") { actions.putBackPrevious() }
-                    PlainRow(
+                    SettingsRow(
                         title = stringResource(if (armed) R.string.settings_previous_armed else R.string.settings_previous),
                         note = if (armed) null else stringResource(R.string.settings_previous_note),
                         bold = armed,
@@ -106,14 +106,14 @@ fun SettingsScreen(
                 }
             }
             if (!Session.hasKeyFile) {
-                item { PlainRow(stringResource(R.string.settings_password), onPress = onChangePassword) }
+                item { SettingsRow(stringResource(R.string.settings_password), onPress = onChangePassword) }
             } else {
-                item { PlainRow(stringResource(R.string.settings_password), stringResource(R.string.settings_password_key_file), noteLines = 3, onPress = null) }
+                item { SettingsRow(stringResource(R.string.settings_password), stringResource(R.string.settings_password_key_file), noteLines = 3, onPress = null) }
             }
 
-            item { Heading(stringResource(R.string.settings_locking)) }
+            item { SettingsHeading(stringResource(R.string.settings_locking)) }
             item {
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_lock_after),
                     note = if (lockMinutes == 0) stringResource(R.string.settings_lock_leaving)
                     else pluralStringResource(R.plurals.settings_lock_minutes, lockMinutes, lockMinutes.toString()),
@@ -127,7 +127,7 @@ fun SettingsScreen(
             item { Say(stringResource(R.string.settings_lock_note)) }
             item {
                 val can = fingerprints is Fingerprint.Available.Yes
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_fingerprint),
                     note = when (val f = fingerprints) {
                         Fingerprint.Available.Yes -> stringResource(R.string.settings_fingerprint_note)
@@ -149,9 +149,9 @@ fun SettingsScreen(
                 )
             }
 
-            item { Heading(stringResource(R.string.settings_codes)) }
+            item { SettingsHeading(stringResource(R.string.settings_codes)) }
             item {
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_vibrate),
                     note = stringResource(R.string.settings_vibrate_note),
                     noteLines = 3,
@@ -160,9 +160,9 @@ fun SettingsScreen(
                 )
             }
 
-            item { Heading(stringResource(R.string.settings_other_apps)) }
+            item { SettingsHeading(stringResource(R.string.settings_other_apps)) }
             item {
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_fill),
                     note = stringResource(if (fillOn) R.string.settings_fill_on else R.string.settings_fill_off),
                     noteLines = 3,
@@ -178,7 +178,7 @@ fun SettingsScreen(
                 )
             }
             item {
-                PlainRow(
+                SettingsRow(
                     title = stringResource(R.string.settings_remember),
                     note = stringResource(R.string.settings_remember_note),
                     noteLines = 3,
@@ -189,7 +189,7 @@ fun SettingsScreen(
             // DuraSpeed itself, not the maker's name: a Kompakt on KompaktOS says Mudita and has none.
             if (duraSpeedPresent) {
                 item {
-                    PlainRow(
+                    SettingsRow(
                         title = stringResource(R.string.settings_duraspeed),
                         note = stringResource(R.string.settings_duraspeed_note),
                         noteLines = 4,
@@ -203,12 +203,12 @@ fun SettingsScreen(
                     )
                 }
             }
-            item { PlainRow(stringResource(R.string.gen_open), onPress = onGenerate) }
-            item { PlainRow(stringResource(R.string.settings_bring_in), stringResource(R.string.settings_bring_in_note), noteLines = 3, onPress = onBringIn) }
+            item { SettingsRow(stringResource(R.string.gen_open), onPress = onGenerate) }
+            item { SettingsRow(stringResource(R.string.settings_bring_in), stringResource(R.string.settings_bring_in_note), noteLines = 3, onPress = onBringIn) }
 
             item { Spacer(Modifier.height(16.dp)) }
             item {
-                PlainRow(stringResource(R.string.settings_close), stringResource(R.string.settings_close_note), noteLines = 3, onPress = onClose)
+                SettingsRow(stringResource(R.string.settings_close), stringResource(R.string.settings_close_note), noteLines = 3, onPress = onClose)
             }
         }
     }

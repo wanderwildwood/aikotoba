@@ -6,6 +6,8 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import androidx.compose.runtime.mutableStateOf
 import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.aikotoba.ui.App
@@ -24,8 +26,11 @@ class MainActivity : ComponentActivity() {
         secure(this)
         incoming.value = intent
         setContent {
-            ThemeMMD(colorScheme = monochrome) {
-                App(incoming = incoming.value, onIncomingTaken = { incoming.value = null })
+            // A steady cursor: a blinking one is a repaint twice a second on an e-ink panel
+            CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
+                ThemeMMD(colorScheme = monochrome) {
+                    App(incoming = incoming.value, onIncomingTaken = { incoming.value = null })
+                }
             }
         }
     }

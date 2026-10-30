@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.autofill.AutofillManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -71,6 +73,7 @@ class FillActivity : ComponentActivity() {
             packageManager.getApplicationLabel(packageManager.getApplicationInfo(fields.packageName, 0)).toString()
         }.getOrDefault(fields.packageName)
         setContent {
+            CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
             ThemeMMD(colorScheme = monochrome) {
                 val open by Session.state.collectAsState()
                 val prefs = remember { Prefs(this) }
@@ -81,6 +84,7 @@ class FillActivity : ComponentActivity() {
                     target == null -> StartScreen(onOpened = { prefs.vault = it; target = it }, onNew = {}, onAbout = {})
                     else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = {})
                 }
+            }
             }
         }
     }

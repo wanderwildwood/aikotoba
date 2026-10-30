@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -89,7 +90,7 @@ internal fun Bar(
 
 /**
  * A row that asks before it acts: the first press arms it and changes what it says, a second
- * press does it, and it disarms itself after four seconds so nothing is left live for whoever
+ * press does it, and it disarms itself after six seconds so nothing is left live for whoever
  * picks the phone up next. Returns whether it is armed, and the press to hand the row.
  */
 @Composable
@@ -97,7 +98,7 @@ internal fun rememberArmed(key: Any?, onConfirmed: () -> Unit): Pair<Boolean, ()
     var armed by remember(key) { mutableStateOf(false) }
     LaunchedEffect(armed) {
         if (armed) {
-            delay(4000)
+            delay(6000)
             armed = false
         }
     }
@@ -113,15 +114,31 @@ internal fun rememberArmed(key: Any?, onConfirmed: () -> Unit): Pair<Boolean, ()
 
 /** A small heading over a group of rows. */
 @Composable
-internal fun Heading(text: String) {
+internal fun Heading(text: String, rule: Boolean = true) {
     TextMMD(
         text = text,
         style = MaterialTheme.typography.labelSmall,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 14.dp, bottom = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = if (rule) 14.dp else 20.dp, bottom = 4.dp),
     )
-    HorizontalDividerMMD()
+    if (rule) HorizontalDividerMMD()
 }
+
+/** A settings page draws no separator lines (STYLE.md): its groups are set apart by space. */
+@Composable
+internal fun SettingsHeading(text: String) = Heading(text, rule = false)
+
+/** A row on a settings page: the same as [PlainRow], without the rule under it. */
+@Composable
+internal fun SettingsRow(
+    title: String,
+    note: String? = null,
+    bold: Boolean = false,
+    noteLines: Int = 2,
+    onLongPress: (() -> Unit)? = null,
+    trailing: (@Composable () -> Unit)? = null,
+    onPress: (() -> Unit)?,
+) = PlainRow(title, note, bold, noteLines, onLongPress, trailing, rule = false, onPress = onPress)
 
 /** A row: what it is, and a line under it only when that line says something. */
 @OptIn(ExperimentalFoundationApi::class)
@@ -133,12 +150,14 @@ internal fun PlainRow(
     noteLines: Int = 2,
     onLongPress: (() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
+    rule: Boolean = true,
     onPress: (() -> Unit)?,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .heightIn(min = 48.dp)
             .let { if (onPress != null || onLongPress != null) it.combinedClickable(onClick = onPress ?: {}, onLongClick = onLongPress) else it }
             .padding(start = 16.dp, end = if (trailing != null) 8.dp else 16.dp, top = 12.dp, bottom = 12.dp),
     ) {
@@ -156,7 +175,7 @@ internal fun PlainRow(
         }
         trailing?.let { Box(Modifier.padding(start = 16.dp)) { it() } }
     }
-    DottedRule()
+    if (rule) DottedRule()
 }
 
 /** A button along the foot of a screen or in a dialog. */

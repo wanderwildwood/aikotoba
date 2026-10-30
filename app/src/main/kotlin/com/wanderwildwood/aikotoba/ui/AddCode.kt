@@ -206,15 +206,15 @@ private fun TypeSecret(issuer: String, account: String, onBack: () -> Unit, onDo
             item { Line(stringResource(R.string.type_secret), secret, KeyboardCapitalization.Characters) { secret = it } }
             if (secret.isNotBlank() && !valid) item { Say(stringResource(R.string.type_secret_bad), bold = true) }
             item {
-                PlainRow(stringResource(R.string.type_digits), digits.toString()) { digits = if (digits == 6) 8 else 6 }
+                SettingsRow(stringResource(R.string.type_digits), digits.toString()) { digits = if (digits == 6) 8 else 6 }
             }
             item {
-                PlainRow(stringResource(R.string.type_period), stringResource(R.string.type_seconds, period.toString())) {
+                SettingsRow(stringResource(R.string.type_period), stringResource(R.string.type_seconds, period.toString())) {
                     period = when (period) { 30 -> 60; 60 -> 15; else -> 30 }
                 }
             }
             item {
-                PlainRow(stringResource(R.string.type_algorithm), algorithm.name) {
+                SettingsRow(stringResource(R.string.type_algorithm), algorithm.name) {
                     algorithm = OtpAlgorithm.entries[(algorithm.ordinal + 1) % OtpAlgorithm.entries.size]
                 }
             }
