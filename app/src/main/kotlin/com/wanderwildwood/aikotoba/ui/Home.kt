@@ -176,7 +176,7 @@ private fun SearchField(query: String, onQuery: (String) -> Unit, modifier: Modi
         modifier = modifier.focusRequester(focus).textActions(),
         decorationBox = { inner ->
             Box {
-                if (query.isEmpty()) TextMMD(text = stringResource(R.string.home_search), style = MaterialTheme.typography.bodyLarge, color = Color(0xFF8A8A8A))
+                if (query.isEmpty()) TextMMD(text = stringResource(R.string.home_search), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
                 inner()
             }
         },

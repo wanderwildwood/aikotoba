@@ -12,6 +12,12 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <queries>
+        <!-- Browsers: a web address opens in a real one, never in the system's bare WebView shell. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
         <!-- DuraSpeed, the Kompakt's background manager: only to say whether it is there. -->
         <package android:name="com.mediatek.duraspeed" />
         <!-- The apps that keep files (Files, a Nextcloud app, Syncthing): the vault lives in one of

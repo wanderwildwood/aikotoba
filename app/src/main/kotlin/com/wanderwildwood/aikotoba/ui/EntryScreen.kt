@@ -1,7 +1,6 @@
 package com.wanderwildwood.aikotoba.ui
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -111,7 +110,7 @@ fun EntryScreen(
                     ValueRow(stringResource(R.string.label_url), item.url, Icons.OpenInNew, stringResource(R.string.cd_open)) {
                         val address = if (item.url.contains("://")) item.url else "https://${item.url}"
                         Locker.errand()
-                        launch(context) { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(address))) }
+                        openLink(context, address, context.getString(R.string.about_no_browser_address, address))
                     }
                 }
             }

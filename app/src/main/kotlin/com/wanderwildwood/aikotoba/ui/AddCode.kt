@@ -75,7 +75,10 @@ fun AddCodeScreen(
         }
     }
 
+    // Once the phone stops asking, a refusal can only be undone in Settings: offer the way there.
+    var cameraRefused by remember { mutableStateOf(false) }
     val allowCamera = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        cameraRefused = !granted
         if (granted) scanning = true else Notice.say(context.getString(R.string.scan_no_permission))
     }
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> if (uri != null) picture(uri) }
@@ -111,6 +114,19 @@ fun AddCodeScreen(
                     } else {
                         Locker.errand()
                         launch(context) { allowCamera.launch(Manifest.permission.CAMERA) }
+                    }
+                }
+            }
+            if (cameraRefused) {
+                item {
+                    PlainRow(stringResource(R.string.add_code_camera_settings), stringResource(R.string.add_code_camera_settings_note)) {
+                        Locker.errand()
+                        launch(context) {
+                            context.startActivity(
+                                android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                    .setData(android.net.Uri.parse("package:" + context.packageName)),
+                            )
+                        }
                     }
                 }
             }

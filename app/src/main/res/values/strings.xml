@@ -125,6 +125,8 @@
     <string name="add_code_title">Add a code</string>
     <string name="add_codes_title">Add codes</string>
     <string name="add_code_camera">Scan the QR code</string>
+    <string name="add_code_camera_settings">Open app settings</string>
+    <string name="add_code_camera_settings_note">The camera is switched off for Passwords. Allow it under Permissions, then come back.</string>
     <string name="add_code_camera_note">Hold the phone over the code. It is read as soon as it is in view.</string>
     <string name="add_code_picture">Read a QR code in a picture</string>
     <string name="add_code_picture_note">A screenshot, or a photo already on the phone.</string>
@@ -278,11 +280,8 @@
 
     <!-- About. -->
     <string name="about_title">Passwords %1$s</string>
-    <string name="about_what">Nothing leaves the phone: the app has no internet permission. The vault is a KeePass file wherever you keep it, and that file is the only copy, so a copy of it is the backup.</string>
-    <string name="about_licence">GNU General Public License v3</string>
-    <string name="about_bundled">KeePass files read and written by kotpass (MIT); Argon2 by Argon2Kt (MIT) and the reference Argon2 (CC0); the QR scanner from Calm QR by Jacob Moss (Apache 2.0), reading with ZXing (Apache 2.0); passphrase words from the EFF large word list (CC BY 3.0); codes and imports from kAuth by OK1CDJ (GPL v3); icons from Material Symbols (Apache 2.0).</string>
+    <string name="about_what">A KeePass vault on this phone. The file is the only copy, so a copy of it is the backup.</string>
     <string name="about_feed_the_llamas">feed the llamas</string>
-    <string name="about_no_browser">There is no browser on this phone to open that with.</string>
     <string name="about_close">Close</string>
     <!-- The folio at the foot of a paged list, "2 / 6"; a tap on it asks for a page -->
     <string name="folio_of">%1$d / %2$d</string>
@@ -290,4 +289,20 @@
     <string name="folio_page">Page %1$d of %2$d</string>
     <string name="folio_go">Go</string>
     <string name="folio_cancel">Cancel</string>
+    <string name="about_licences">Licences</string>
+    <string name="licences_title">Licences</string>
+    <string name="licences_source_head">Source code</string>
+    <string name="licences_licence_head">Licence</string>
+    <string name="licences_licence">Passwords is free software under the GNU General Public License, version 3 only (GPL-3.0-only), copyright wander wildwood, for what is written here. It also contains code from kAuth, under the same licence. The work it is built on keeps its own licence and its authors keep their copyright, as listed under Built with. The full text of each licence is at the end of this page.</string>
+    <string name="licences_built_head">Built with</string>
+    <string name="licences_back">Back</string>
+    <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
+    <string name="licences_gpl">GNU General Public License, version 3</string>
+    <string name="licences_apache">Apache License, version 2.0</string>
+    <string name="licences_mit">MIT License</string>
+    <string name="licences_ofl">SIL Open Font License, version 1.1</string>
+    <string name="about_privacy_head">Privacy</string>
+    <string name="about_privacy">Passwords sends nothing anywhere: it has no permission to use the internet. Your passwords stay in the KeePass file you chose, encrypted with your master password. The camera is used only to read a code you point it at, and nothing of the picture is kept. The full statement is PRIVACY.md in the source.</string>
+    <string name="about_terms_head">Terms</string>
+    <string name="about_terms">Passwords is provided as it is, without any warranty of any kind, as the GNU General Public License says, and you use it at your own risk. The vault file is the only copy of your passwords: keep a copy of it somewhere safe, and remember the master password, because nobody can recover it for you.</string>
 </resources>

@@ -81,8 +81,8 @@ class FillActivity : ComponentActivity() {
                 val vault = open
                 when {
                     vault != null -> Pick(vault, fields, site, site ?: appName, prefs) { item -> fill(item, fields, site, prefs) }
-                    target == null -> StartScreen(onOpened = { prefs.vault = it; target = it }, onNew = {}, onAbout = {})
-                    else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = {})
+                    target == null -> StartScreen(onOpened = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
+                    else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
                 }
             }
             }

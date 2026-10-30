@@ -46,13 +46,13 @@ import kotlinx.coroutines.withContext
 
 /** Nothing chosen yet: open a vault file, or make one. */
 @Composable
-fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: () -> Unit, onGenerate: (() -> Unit)? = null) {
+fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: (() -> Unit)?, onGenerate: (() -> Unit)? = null) {
     val pick = rememberVaultPicker(onOpened)
     val make = rememberFileMaker(onNew)
     val newName = stringResource(R.string.new_vault_file_name)
     Frame(
         title = stringResource(R.string.app_name),
-        actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
+        actions = { if (onAbout != null) BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
         PagedColumn(Modifier.fillMaxWidth()) {
             item { Say(stringResource(R.string.start_what), Modifier.padding(top = 8.dp)) }
@@ -80,7 +80,7 @@ fun UnlockScreen(
     visiting: Boolean,
     onOther: (Uri) -> Unit,
     onNew: (Uri) -> Unit,
-    onAbout: () -> Unit,
+    onAbout: (() -> Unit)?,
     onUnlocked: () -> Unit = {},
     onGenerate: (() -> Unit)? = null,
 ) {
@@ -215,7 +215,7 @@ fun UnlockScreen(
 
     Frame(
         title = stringResource(R.string.app_name),
-        actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
+        actions = { if (onAbout != null) BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
         PagedColumn(Modifier.fillMaxWidth()) {
             item {
