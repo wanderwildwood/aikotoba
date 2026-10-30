@@ -10,7 +10,7 @@ Android 12 device.
 | | |
 |---|---|
 | ![The codes, each pressed to copy](screenshots/1-codes.png) | ![One sign-in](screenshots/2-entry.png) |
-| ![A new password, its strength said plainly](screenshots/3-generator.png) | ![Codes brought in from another authenticator](screenshots/4-import.png) |
+| ![A new password, its strength said plainly](screenshots/3-generator.png) | ![About: privacy, terms and licences](screenshots/4-about.png) |
 
 ## What it does
 
