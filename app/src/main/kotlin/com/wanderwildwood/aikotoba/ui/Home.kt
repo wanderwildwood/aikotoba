@@ -71,7 +71,6 @@ fun HomeScreen(
     onRetrySave: () -> Unit,
     onSaveTo: (android.net.Uri) -> Unit,
     onSettings: () -> Unit,
-    onAbout: () -> Unit,
 ) {
     var codes by remember { mutableStateOf(prefs.showCodes) }
     var searching by remember { mutableStateOf(false) }
@@ -96,7 +95,6 @@ fun HomeScreen(
         actions = {
             BarButton(Icons.Lock, stringResource(R.string.cd_lock)) { Session.lock() }
             BarButton(Icons.Settings, stringResource(R.string.cd_settings), onSettings)
-            BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout)
         },
         floating = {
             FloatingActionButtonMMD(

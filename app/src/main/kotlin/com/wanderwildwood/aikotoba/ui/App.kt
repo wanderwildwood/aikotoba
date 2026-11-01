@@ -171,7 +171,6 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                         }
                     },
                     onSettings = { stack.add(Route.Settings) },
-                    onAbout = onAbout,
                 )
                 is Route.Entry -> {
                     val item = vault.items.firstOrNull { it.uuid == route.uuid }
@@ -297,6 +296,7 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                         target = null
                     },
                     actions = actions,
+                    onAbout = onAbout,
                 )
                 Route.ChangePassword -> {
                     val keepTitle = stringResource(R.string.fingerprint_keep_title)

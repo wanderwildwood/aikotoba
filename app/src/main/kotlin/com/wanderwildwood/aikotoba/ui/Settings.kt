@@ -47,6 +47,7 @@ fun SettingsScreen(
     onOther: (Uri) -> Unit,
     onClose: () -> Unit,
     actions: Actions,
+    onAbout: () -> Unit,
 ) {
     val context = LocalContext.current
     var lockMinutes by remember { mutableIntStateOf(prefs.lockMinutes) }
@@ -74,7 +75,11 @@ fun SettingsScreen(
     val pickOther = rememberVaultPicker(onOther)
     val copy = rememberFileMaker { uri -> actions.saveCopy(uri) }
 
-    Frame(title = stringResource(R.string.settings_title), onBack = onBack) {
+    Frame(
+        title = stringResource(R.string.settings_title),
+        onBack = onBack,
+        actions = { BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
+    ) {
         PagedColumn(Modifier.fillMaxSize()) {
             item { SettingsHeading(stringResource(R.string.settings_vault)) }
             item {
