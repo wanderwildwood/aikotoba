@@ -16,7 +16,7 @@ the backup.
 ## What it does
 
 - **Opens a KeePass (KDBX 3 or 4) file** wherever it lives: a folder on the phone, the folder
-  Nextcloud or Syncthing keeps in step, a Samba share or a Nextcloud through Files. The same file opens in
+  Nextcloud or Syncthing keeps in step, a Samba share or a Nextcloud through Cabinet. The same file opens in
   KeePassXC on a computer, and changes made in either show up in the other.
 - **The keyboard's Done key unlocks.** Type the master password and press the key; there is no
   second press. A key file, if the vault uses one, is chosen once on the same screen.
@@ -88,11 +88,11 @@ so a save takes as long as an unlock.
   still works without it.
 - **Not saved from other apps.** Filling never offers to save what you typed elsewhere.
 - **A read-only vault stays read-only.** A file the app was only allowed to read (a server's
-  file through Files before its version 0.3.0, for one) is not written; the list says so at the
+  file through Cabinet before its version 0.3.0, for one) is not written; the list says so at the
   top, changes are kept while the vault is open, and pressing that line saves the vault to a
-  file you choose, which becomes the vault. From Files 0.3.0, a vault on a Samba share or a
-  Nextcloud, chosen through Files in the system's file picker, is saved back to the server, and
-  Files refuses to replace it if another device saved it meanwhile.
+  file you choose, which becomes the vault. From Cabinet 0.3.0, a vault on a Samba share or a
+  Nextcloud, chosen through Cabinet in the system's file picker, is saved back to the server, and
+  Cabinet refuses to replace it if another device saved it meanwhile.
 
 ## On the Kompakt: DuraSpeed
 
