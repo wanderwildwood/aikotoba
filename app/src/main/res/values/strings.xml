@@ -281,7 +281,7 @@
     <!-- About. -->
     <string name="about_title">Passwords %1$s</string>
     <string name="about_what">A KeePass vault on this phone. The file is the only copy, so a copy of it is the backup.</string>
-    <string name="about_feed_the_llamas">feed the llamas</string>
+    <string name="about_feed_the_llamas">Feed the llamas</string>
     <string name="about_close">Close</string>
     <string name="about_licences">Licences</string>
     <string name="licences_title">Licences</string>
