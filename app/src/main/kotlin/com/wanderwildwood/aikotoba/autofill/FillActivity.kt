@@ -41,6 +41,7 @@ import com.wanderwildwood.aikotoba.ui.PlainRow
 import com.wanderwildwood.aikotoba.ui.Say
 import com.wanderwildwood.aikotoba.ui.StartScreen
 import com.wanderwildwood.aikotoba.ui.UnlockScreen
+import com.wanderwildwood.aikotoba.ui.houseTypography
 import com.wanderwildwood.aikotoba.ui.monochrome
 import com.wanderwildwood.aikotoba.vault.Item
 import com.wanderwildwood.aikotoba.vault.Session
@@ -75,7 +76,7 @@ class FillActivity : ComponentActivity() {
         }.getOrDefault(fields.packageName)
         setContent {
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-            ThemeMMD(colorScheme = monochrome) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
                 ArmedScope {
                     val open by Session.state.collectAsState()
                     val prefs = remember { Prefs(this) }
