@@ -1,0 +1,14 @@
+{
+  "uniqueId": "kauth",
+  "name": "kAuth (codes and imports)",
+  "description": "Code generation, the otpauth:// and Google Authenticator transfer readers and kAuth's backup format, taken from kAuth (com/ok1cdj/kauth/core), with their notices.",
+  "developers": [
+    {
+      "name": "Ondrej Kolonicny (OK1CDJ)"
+    }
+  ],
+  "website": "https://github.com/ok1cdj/kAuth",
+  "licenses": [
+    "GPL-3.0-or-later"
+  ]
+}

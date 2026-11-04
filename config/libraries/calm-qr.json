@@ -1,0 +1,14 @@
+{
+  "uniqueId": "calm-qr",
+  "name": "Calm QR (the scanner)",
+  "description": "The QR scanner's camera code, taken from Calm QR (com/caravanfire/calmqr), with its notice.",
+  "developers": [
+    {
+      "name": "Jacob Moss"
+    }
+  ],
+  "website": "https://github.com/jacobrmoss/calm-qr",
+  "licenses": [
+    "Apache-2.0"
+  ]
+}

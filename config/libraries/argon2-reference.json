@@ -1,0 +1,14 @@
+{
+  "uniqueId": "argon2-reference-c",
+  "name": "Argon2 reference implementation (native, inside Argon2Kt)",
+  "description": "The reference Argon2 in C, built into Argon2Kt's native library; it turns the master password into the vault key.",
+  "developers": [
+    {
+      "name": "Daniel Dinu, Dmitry Khovratovich, Jean-Philippe Aumasson and Samuel Neves"
+    }
+  ],
+  "website": "https://github.com/P-H-C/phc-winner-argon2",
+  "licenses": [
+    "argon2-reference"
+  ]
+}

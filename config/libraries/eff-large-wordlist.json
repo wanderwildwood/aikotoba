@@ -1,0 +1,14 @@
+{
+  "uniqueId": "eff-large-wordlist",
+  "name": "EFF large word list for passphrases",
+  "description": "The words the generator draws passphrases from (assets/eff_large_wordlist.txt).",
+  "developers": [
+    {
+      "name": "Electronic Frontier Foundation"
+    }
+  ],
+  "website": "https://www.eff.org/dice",
+  "licenses": [
+    "eff-wordlist-cc-by"
+  ]
+}
