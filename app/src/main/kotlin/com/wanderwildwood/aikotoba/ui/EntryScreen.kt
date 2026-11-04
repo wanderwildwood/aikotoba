@@ -128,7 +128,7 @@ fun EntryScreen(
             }
             item { Spacer(Modifier.height(24.dp)) }
             item {
-                val (armed, press) = rememberArmed(item.uuid, onDelete)
+                val (armed, press) = rememberArmed(item.uuid, onConfirmed = onDelete)
                 PlainRow(
                     title = stringResource(if (armed) R.string.entry_delete_armed else R.string.entry_delete),
                     bold = armed,

@@ -265,12 +265,16 @@ fun ConflictDialog(actions: Actions, onReload: () -> Unit, onReplace: () -> Unit
     }
     val name = stringResource(R.string.conflict_copy_name)
     EInkDialog(onDismiss = onDismiss) {
-        Say(stringResource(R.string.conflict_what), Modifier.padding(bottom = 8.dp))
-        FootButton(stringResource(R.string.conflict_reload), onClick = onReload)
-        Spacer(Modifier.height(10.dp))
-        FootButton(stringResource(R.string.conflict_copy)) { copy(name) }
-        Spacer(Modifier.height(10.dp))
-        val (armed, press) = rememberArmed("replace", onReplace)
-        FootButton(stringResource(if (armed) R.string.conflict_replace_armed else R.string.conflict_replace), onClick = press)
+        ArmedScope {
+            Column {
+                Say(stringResource(R.string.conflict_what), Modifier.padding(bottom = 8.dp))
+                FootButton(stringResource(R.string.conflict_reload), onClick = onReload)
+                Spacer(Modifier.height(10.dp))
+                FootButton(stringResource(R.string.conflict_copy)) { copy(name) }
+                Spacer(Modifier.height(10.dp))
+                val (armed, press) = rememberArmed("replace", onConfirmed = onReplace)
+                FootButton(stringResource(if (armed) R.string.conflict_replace_armed else R.string.conflict_replace), onClick = press)
+            }
+        }
     }
 }

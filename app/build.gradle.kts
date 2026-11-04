@@ -127,6 +127,7 @@ dependencies {
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
+    testRuntimeOnly(libs.junit.vintage)
     // kAuth's own Argon2id, to make kAuth-format backups in the tests.
     testImplementation(libs.bouncycastle)
 }

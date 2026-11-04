@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.mudita.mmd.ThemeMMD
 import com.wanderwildwood.aikotoba.ui.App
 import com.wanderwildwood.aikotoba.ui.monochrome
+import com.wanderwildwood.aikotoba.ui.ArmedScope
 
 /**
  * The app's one window. Also where a vault file opened from Files arrives, and links or
@@ -29,7 +30,7 @@ class MainActivity : ComponentActivity() {
             // A steady cursor: a blinking one is a repaint twice a second on an e-ink panel
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
                 ThemeMMD(colorScheme = monochrome) {
-                    App(incoming = incoming.value, onIncomingTaken = { incoming.value = null })
+                    ArmedScope { App(incoming = incoming.value, onIncomingTaken = { incoming.value = null }) }
                 }
             }
         }

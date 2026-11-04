@@ -50,6 +50,8 @@ camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" 
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit5" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+# Runs the house JUnit 4 tests (Armed, HouseAbout, Licences...) on the JUnit Platform.
+junit-vintage = { module = "org.junit.vintage:junit-vintage-engine" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 
 [plugins]

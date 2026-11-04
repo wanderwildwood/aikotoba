@@ -49,6 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import com.wanderwildwood.aikotoba.ui.ArmedScope
 
 /**
  * Opened from another app's sign-in screen: unlock if need be, choose the entry, and its user
@@ -75,14 +76,16 @@ class FillActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
             ThemeMMD(colorScheme = monochrome) {
-                val open by Session.state.collectAsState()
-                val prefs = remember { Prefs(this) }
-                var target by remember { mutableStateOf(prefs.vault) }
-                val vault = open
-                when {
-                    vault != null -> Pick(vault, fields, site, site ?: appName, prefs) { item -> fill(item, fields, site, prefs) }
-                    target == null -> StartScreen(onOpened = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
-                    else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
+                ArmedScope {
+                    val open by Session.state.collectAsState()
+                    val prefs = remember { Prefs(this) }
+                    var target by remember { mutableStateOf(prefs.vault) }
+                    val vault = open
+                    when {
+                        vault != null -> Pick(vault, fields, site, site ?: appName, prefs) { item -> fill(item, fields, site, prefs) }
+                        target == null -> StartScreen(onOpened = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
+                        else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
+                    }
                 }
             }
             }

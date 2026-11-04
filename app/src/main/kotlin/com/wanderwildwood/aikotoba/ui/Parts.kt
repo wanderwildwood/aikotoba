@@ -19,9 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -89,26 +87,16 @@ internal fun Bar(
 
 /**
  * A row that asks before it acts: the first press arms it and changes what it says, a second
- * press does it, and it disarms itself after six seconds so nothing is left live for whoever
- * picks the phone up next. Returns whether it is armed, and the press to hand the row.
+ * press does it. It stays armed, with no timer, until the next other touch, Back, leaving the
+ * screen or the screen going off (the shared Armed.kt). Returns whether it is armed, and the
+ * press to hand the row. [disarmOnBack] false is for a question Back itself asks ("Back again
+ * to discard"): the screen's own BackHandler then answers it.
  */
 @Composable
-internal fun rememberArmed(key: Any?, onConfirmed: () -> Unit): Pair<Boolean, () -> Unit> {
-    var armed by remember(key) { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(6000)
-            armed = false
-        }
-    }
-    return armed to {
-        if (armed) {
-            armed = false
-            onConfirmed()
-        } else {
-            armed = true
-        }
-    }
+internal fun rememberArmed(key: Any?, disarmOnBack: Boolean = true, onConfirmed: () -> Unit): Pair<Boolean, () -> Unit> {
+    val armed = rememberArmedFlag(key, disarmOnBack = disarmOnBack)
+    val confirmed by rememberUpdatedState(onConfirmed)
+    return armed.value to { armed.press { confirmed() } }
 }
 
 /** A small heading over a group of rows. */

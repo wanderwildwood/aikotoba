@@ -38,7 +38,7 @@ fun EditScreen(route: Route.Edit, onClose: () -> Unit, onSave: (com.wanderwildwo
     val start = remember(route) { route.draft.value }
     val dirty = draft != start
     var shown by remember { mutableStateOf(route.uuid == null) }
-    val (leaving, leave) = rememberArmed(dirty) { onClose() }
+    val (leaving, leave) = rememberArmed(dirty, disarmOnBack = false) { onClose() }
     val close = {
         if (!dirty) onClose() else {
             if (!leaving) Notice.say(context.getString(R.string.edit_discard_armed))
