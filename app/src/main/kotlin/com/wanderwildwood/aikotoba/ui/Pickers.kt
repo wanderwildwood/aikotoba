@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.wanderwildwood.aikotoba.Locker
@@ -17,7 +16,7 @@ import com.wanderwildwood.aikotoba.R
 @Composable
 fun rememberVaultPicker(onPicked: (Uri) -> Unit): () -> Unit {
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+    val launcher = rememberLauncherForActivityResult(FilesOpenDocument(writable = true)) { uri ->
         if (uri != null) {
             keep(context, uri)
             onPicked(uri)
@@ -33,7 +32,7 @@ fun rememberVaultPicker(onPicked: (Uri) -> Unit): () -> Unit {
 @Composable
 fun rememberFileMaker(onMade: (Uri) -> Unit): (String) -> Unit {
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/octet-stream")) { uri ->
+    val launcher = rememberLauncherForActivityResult(FilesCreateDocument("application/octet-stream")) { uri ->
         if (uri != null) {
             keep(context, uri)
             onMade(uri)
@@ -49,7 +48,7 @@ fun rememberFileMaker(onMade: (Uri) -> Unit): (String) -> Unit {
 @Composable
 fun rememberOnePicker(onPicked: (Uri) -> Unit): () -> Unit {
     val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) onPicked(uri) }
+    val launcher = rememberLauncherForActivityResult(FilesOpenDocument()) { uri -> if (uri != null) onPicked(uri) }
     return {
         Locker.errand()
         launch(context) { launcher.launch(arrayOf("*/*")) }

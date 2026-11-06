@@ -20,6 +20,8 @@
         </intent>
         <!-- DuraSpeed, the Kompakt's background manager: only to say whether it is there. -->
         <package android:name="com.mediatek.duraspeed" />
+        <!-- Files (Cabinet): opening and saving a vault or key file on its e-ink screens. -->
+        <package android:name="com.wanderwildwood.tana" />
         <!-- The apps that keep files (Files, a Nextcloud app, Syncthing): the vault lives in one of
              them. Without this, from Android 11 on, the right to a file picked through one of them
              outlives the app's own ability to see that app: an update of Passwords left a vault on
