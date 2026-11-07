@@ -51,7 +51,7 @@ fun EntryScreen(
         onBack = onBack,
         actions = { BarButton(Icons.Edit, stringResource(R.string.cd_edit), onEdit) },
     ) {
-        PagedColumn(Modifier.fillMaxSize()) {
+        PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
             if (item.username.isNotEmpty()) {
                 item {
                     val label = stringResource(R.string.label_username)

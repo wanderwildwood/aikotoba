@@ -46,7 +46,7 @@ fun ReviewScreen(found: Found, existing: List<OtpSpec>, onBack: () -> Unit, onAd
         onBack = onBack,
         actions = { BarWord(stringResource(R.string.review_add), ready = count > 0) { onAdd(found.codes.filterIndexed { i, _ -> chosen[i] }) } },
     ) {
-        PagedColumn(Modifier.fillMaxSize()) {
+        PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
             if (found.fromGoogle) item { Say(stringResource(R.string.import_google), bold = true) }
             if (found.codes.isEmpty()) item { Say(stringResource(R.string.import_nothing)) }
             found.codes.forEachIndexed { i, spec ->
@@ -124,7 +124,7 @@ fun KauthScreen(blob: String, onBack: () -> Unit, onOpened: (Found) -> Unit) {
     }
 
     Frame(title = stringResource(R.string.kauth_title), onBack = onBack) {
-        PagedColumn(Modifier.fillMaxSize()) {
+        PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
             item { Say(stringResource(R.string.kauth_what), Modifier.padding(top = 8.dp)) }
             item {
                 Column(Modifier.padding(16.dp)) {

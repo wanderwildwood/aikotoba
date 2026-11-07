@@ -184,7 +184,7 @@ private fun SearchField(query: String, onQuery: (String) -> Unit, modifier: Modi
 @Composable
 private fun EntryList(items: List<Item>, onEntry: (UUID) -> Unit, empty: String?) {
     val state = rememberLazyListState()
-    PagedColumn(Modifier.fillMaxSize(), state = state) {
+    PagedColumn(Modifier.fillMaxSize(), state = state, showCutRow = true) {
         if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
         for (item in items) {
             item(key = item.uuid.toString()) {
@@ -249,7 +249,7 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinn
     val context = LocalContext.current
     TickOnChange(vibrate, items.mapNotNull { it.otp }.filter { !it.isCounter }.map { it.period }.distinct().sorted())
     val state = rememberLazyListState()
-    PagedColumn(Modifier.fillMaxSize(), state = state) {
+    PagedColumn(Modifier.fillMaxSize(), state = state, showCutRow = true) {
         if (empty != null) item { Say(empty, Modifier.padding(top = 8.dp)) }
         if (items.any { it.otp != null }) {
             item(key = "hint") {

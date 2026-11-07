@@ -105,7 +105,7 @@ fun AddCodeScreen(
     }
 
     Frame(title = stringResource(if (attaching) R.string.add_code_title else R.string.add_codes_title), onBack = onBack) {
-        PagedColumn(Modifier.fillMaxSize()) {
+        PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
             if (reading) item { Say(stringResource(R.string.add_code_reading), bold = true) }
             item {
                 PlainRow(stringResource(R.string.add_code_camera), stringResource(R.string.add_code_camera_note)) {
@@ -216,7 +216,7 @@ private fun TypeSecret(issuer: String, account: String, onBack: () -> Unit, onDo
             }
         },
     ) {
-        PagedColumn(Modifier.fillMaxSize()) {
+        PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
             item { Line(stringResource(R.string.type_issuer), name) { name = it } }
             item { Line(stringResource(R.string.type_account), user) { user = it } }
             item { Line(stringResource(R.string.type_secret), secret, KeyboardCapitalization.Characters) { secret = it } }
