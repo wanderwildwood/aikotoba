@@ -217,7 +217,9 @@ fun UnlockScreen(
         title = stringResource(R.string.app_name),
         actions = { if (onAbout != null) BarButton(Icons.Info, stringResource(R.string.cd_about), onAbout) },
     ) {
-        PagedColumn(Modifier.fillMaxWidth(), showCutRow = true) {
+        // No scrollbar while the vault is opening: the "Opening" line makes the page one line
+        // taller, so a scrollbar flashed up for the split second before the list took over.
+        PagedColumn(Modifier.fillMaxWidth(), showCutRow = true, isScrollbarVisible = !busy) {
             item {
                 Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
                     TextMMD(text = name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
