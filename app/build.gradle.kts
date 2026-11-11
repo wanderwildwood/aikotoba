@@ -17,8 +17,14 @@ android {
         // The Kompakt runs Android 12 (API 31); nothing here needs anything newer.
         minSdk = 31
         targetSdk = 31
-        versionCode = 25
-        versionName = "0.1.24"
+        versionCode = 26
+        versionName = "0.1.25"
+
+        ndk {
+            // The Kompakt is arm64. The emulator an x86_64 debug build is tried on is added
+            // below, so a release carries one copy of the native code rather than four.
+            abiFilters += "arm64-v8a"
+        }
     }
 
     // A real keystore in signing/ signs every build type when it is present, so the
@@ -43,6 +49,7 @@ android {
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
+            ndk { abiFilters += "x86_64" }
             realSigningConfig?.let { signingConfig = it }
         }
         getByName("release") {
