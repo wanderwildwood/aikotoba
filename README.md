@@ -11,7 +11,7 @@ the backup.
 | | |
 |---|---|
 | ![The codes, each pressed to copy](screenshots/1-codes.png) | ![One sign-in](screenshots/2-entry.png) |
-| ![A new password, its strength said plainly](screenshots/3-generator.png) | ![About: privacy, terms and licences](screenshots/4-about.png) |
+| ![A new password, its strength said plainly](screenshots/3-generator.png) | ![About: privacy, terms and licenses](screenshots/4-about.png) |
 
 ## What it does
 
@@ -149,7 +149,7 @@ For updates without doing this by hand, add this repository to
   marked in the file: kAuth's Argon2id is reached through the same native Argon2.
 - [Calm QR](https://github.com/jacobrmoss/calm-qr) by Jacob Moss (Apache 2.0): the QR scanner,
   its live camera picture and the way it focuses on a code, under `com/caravanfire/calmqr` with
-  its notice and licence. Changed, as the file says: it reads with ZXing in place of Calm QR's
+  its notice and license. Changed, as the file says: it reads with ZXing in place of Calm QR's
   own Rust decoder.
 - [ZXing](https://github.com/zxing/zxing) (Apache 2.0) reads QR codes, in the camera's picture
   and in pictures on the phone. [CameraX](https://developer.android.com/jetpack/androidx/releases/camera)
@@ -158,7 +158,7 @@ For updates without doing this by hand, add this repository to
 - [MMD](https://github.com/mudita/MMD) (Apache 2.0), Mudita's design system, and icons from
   Material Symbols (Apache 2.0).
 
-## Licence
+## License
 
 GPL-3.0-only. See [LICENSE](LICENSE).
 
@@ -175,4 +175,4 @@ You should have received a copy of the GNU General Public License along with thi
 not, see <https://www.gnu.org/licenses/>.
 
 The kAuth files keep their own GPL-3.0-or-later notices, which allow them here. The Calm QR
-file keeps its Apache 2.0 notice, with the licence beside it.
+file keeps its Apache 2.0 notice, with the license beside it.
