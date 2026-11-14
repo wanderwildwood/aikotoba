@@ -189,7 +189,7 @@ private fun ScanScreen(onBack: () -> Unit, onFound: (Recognised) -> Unit) {
                 Notice.say(context.getString(R.string.scan_unavailable))
                 onBack()
             },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(1f).keepColors(),
         )
     }
 }

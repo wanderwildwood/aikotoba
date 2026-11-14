@@ -164,6 +164,15 @@ fun SettingsScreen(
                     onPress = { vibrate = !vibrate; prefs.vibrateOnChange = vibrate },
                 )
             }
+            item {
+                SettingsRow(
+                    title = stringResource(R.string.settings_dark),
+                    note = stringResource(R.string.settings_dark_note),
+                    noteLines = 3,
+                    trailing = { SwitchMMD(checked = DarkMode.on, onCheckedChange = null) },
+                    onPress = { DarkMode.set(context, !DarkMode.on) },
+                )
+            }
 
             item { SettingsHeading(stringResource(R.string.settings_other_apps)) }
             item {
