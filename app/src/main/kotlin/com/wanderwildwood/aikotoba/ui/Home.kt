@@ -79,6 +79,9 @@ fun HomeScreen(
     val items = open.items.filter { item ->
         (!codes || item.otp != null) && (q.isEmpty() || item.findable(codes).any { it.contains(q, ignoreCase = true) })
     }
+    // Back from All goes to Codes, as a press on Codes would; only Back from Codes leaves the
+    // app. Back with the search open closes the search first.
+    BackHandler(enabled = !searching && !codes) { codes = true; prefs.showCodes = true }
     BackHandler(enabled = searching) { searching = false; query = "" }
     // One clock for the codes and the seconds beside the magnifier, so the two never disagree.
     val now = if (codes) rememberNow() else 0L
