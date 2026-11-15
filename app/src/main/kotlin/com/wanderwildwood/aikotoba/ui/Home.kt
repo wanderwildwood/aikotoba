@@ -290,7 +290,7 @@ private fun CodeList(items: List<Item>, onEntry: (UUID) -> Unit, now: Long, pinn
                     Column(horizontalAlignment = Alignment.End) {
                         TextMMD(
                             text = code?.let(OtpField::spaced) ?: stringResource(R.string.code_unreadable),
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                         )
                         val own = when {

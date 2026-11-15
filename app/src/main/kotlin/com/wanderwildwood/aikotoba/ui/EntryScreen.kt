@@ -88,7 +88,7 @@ fun EntryScreen(
                             TextMMD(text = label, style = MaterialTheme.typography.labelSmall)
                             TextMMD(
                                 text = code?.let(OtpField::spaced) ?: stringResource(R.string.code_unreadable),
-                                style = MaterialTheme.typography.headlineSmall,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                             )
                             TextMMD(
