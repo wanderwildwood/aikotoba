@@ -51,6 +51,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import com.wanderwildwood.aikotoba.ui.ArmedScope
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 
 /**
  * Opened from another app's sign-in screen: unlock if need be, choose the entry, and its user
@@ -141,7 +144,7 @@ private fun Pick(open: Session.Open, fields: Fields, site: String?, asking: Stri
                 item {
                     PlainRow(
                         title = stringResource(R.string.fill_remember, asking),
-                        trailing = { SwitchMMD(checked = rememberApp, onCheckedChange = null) },
+                        trailing = { SwitchMMD(checked = rememberApp, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(rememberApp) }) },
                         onPress = { rememberApp = !rememberApp; prefs.rememberForApp = rememberApp },
                     )
                 }

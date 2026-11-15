@@ -35,6 +35,9 @@ import com.wanderwildwood.aikotoba.vault.Session
 import com.wanderwildwood.aikotoba.vault.VaultFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 
 @Composable
 fun SettingsScreen(
@@ -141,7 +144,7 @@ fun SettingsScreen(
                         is Fingerprint.Available.Other -> stringResource(R.string.settings_fingerprint_other, f.code)
                     },
                     noteLines = 5,
-                    trailing = { SwitchMMD(checked = fingerprintOn, onCheckedChange = null) },
+                    trailing = { SwitchMMD(checked = fingerprintOn, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(fingerprintOn) }) },
                     onPress = {
                         if (fingerprintOn) {
                             Fingerprint.forget(context)
@@ -160,7 +163,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_vibrate),
                     note = stringResource(R.string.settings_vibrate_note),
                     noteLines = 3,
-                    trailing = { SwitchMMD(checked = vibrate, onCheckedChange = null) },
+                    trailing = { SwitchMMD(checked = vibrate, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(vibrate) }) },
                     onPress = { vibrate = !vibrate; prefs.vibrateOnChange = vibrate },
                 )
             }
@@ -169,7 +172,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_dark),
                     note = stringResource(R.string.settings_dark_note),
                     noteLines = 3,
-                    trailing = { SwitchMMD(checked = DarkMode.on, onCheckedChange = null) },
+                    trailing = { SwitchMMD(checked = DarkMode.on, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(DarkMode.on) }) },
                     onPress = { DarkMode.set(context, !DarkMode.on) },
                 )
             }
@@ -196,7 +199,7 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_remember),
                     note = stringResource(R.string.settings_remember_note),
                     noteLines = 3,
-                    trailing = { SwitchMMD(checked = rememberApp, onCheckedChange = null) },
+                    trailing = { SwitchMMD(checked = rememberApp, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(rememberApp) }) },
                     onPress = { rememberApp = !rememberApp; prefs.rememberForApp = rememberApp },
                 )
             }

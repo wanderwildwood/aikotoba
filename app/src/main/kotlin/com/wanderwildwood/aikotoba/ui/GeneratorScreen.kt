@@ -25,6 +25,9 @@ import com.wanderwildwood.aikotoba.Clipboard
 import com.wanderwildwood.aikotoba.Generator
 import com.wanderwildwood.aikotoba.Prefs
 import com.wanderwildwood.aikotoba.R
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.toggleableState
+import androidx.compose.ui.state.ToggleableState
 
 /**
  * A new password or passphrase, with how strong it is said plainly. Reached from an entry's
@@ -132,5 +135,5 @@ fun GeneratorScreen(prefs: Prefs, onBack: () -> Unit, onUse: ((String) -> Unit)?
 
 @Composable
 private fun Toggle(label: String, on: Boolean, onChange: (Boolean) -> Unit) {
-    SettingsRow(title = label, trailing = { SwitchMMD(checked = on, onCheckedChange = null) }, onPress = { onChange(!on) })
+    SettingsRow(title = label, trailing = { SwitchMMD(checked = on, onCheckedChange = null, modifier = Modifier.semantics { toggleableState = ToggleableState(on) }) }, onPress = { onChange(!on) })
 }
