@@ -291,9 +291,9 @@
     <string name="licences_back">Back</string>
     <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
     <string name="about_privacy_head">Privacy</string>
-    <string name="about_privacy">Passwords sends nothing anywhere: it has no permission to use the internet. Your passwords stay in the KeePass file you chose, encrypted with your master password. The camera is used only to read a code you point it at, and nothing of the picture is kept. The full statement is PRIVACY.md in the source.</string>
+    <string name="about_privacy">Passwords sends nothing anywhere: it has no permission to use the internet. Your passwords stay in the KeePass file you chose, encrypted with your master password. The camera is used only to read a code you point it at, and nothing of the picture is kept. The full statement is PRIVACY.md in the source. \"Feed the llamas\" in About opens a donation page (square.link) in your browser, only when you press it. The app sends nothing there; if you give, the payment is handled on that page by Square, not by this app.</string>
     <string name="about_terms_head">Terms</string>
-    <string name="about_terms">Passwords is provided as it is, without any warranty of any kind, as the GNU General Public License says, and you use it at your own risk. The vault file is the only copy of your passwords: keep a copy of it somewhere safe, and remember the master password, because nobody can recover it for you.</string>
+    <string name="about_terms">Passwords is provided as it is, without any warranty of any kind, as the GNU General Public License says, and you use it at your own risk. The vault file is the only copy of your passwords: keep a copy of it somewhere safe, and remember the master password, because nobody can recover it for you. A donation through \"Feed the llamas\" is voluntary and unlocks nothing: the app is the same with or without one.</string>
     <string name="licences_full_head">Full texts</string>
     <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
     <string name="licences_full_apache">Apache License 2.0 (full text)</string>
