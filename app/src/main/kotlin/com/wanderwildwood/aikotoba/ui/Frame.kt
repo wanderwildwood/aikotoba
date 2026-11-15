@@ -33,6 +33,9 @@ internal fun Frame(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Scaffold(
+        // The notice along the foot goes with the next press, before that press does its own
+        // thing, so a press that says something new leaves the new thing said.
+        modifier = Modifier.onEachPress { Notice.text = null },
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = { Bar(title, onBack, backIcon, actions) },
         bottomBar = { Notice.text?.let { t -> Column { NoticeStrip(t) { if (Notice.text == t) Notice.text = null } } } },

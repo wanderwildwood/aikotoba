@@ -12,7 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.PersistableBundle
 import android.os.SystemClock
-import android.widget.Toast
+import com.wanderwildwood.aikotoba.ui.Notice
 
 /**
  * Copying a password or a code, and taking it off the clipboard thirty seconds later.
@@ -48,7 +48,8 @@ object Clipboard {
                 alarms.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(app))
             }
         }
-        Toast.makeText(app, app.getString(R.string.copied, label, SECONDS.toString()), Toast.LENGTH_SHORT).show()
+        // Said along the foot until the next press, not in a toast that goes by itself.
+        Notice.say(app.getString(R.string.copied, label, SECONDS.toString()))
     }
 
     /**

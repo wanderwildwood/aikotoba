@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -30,7 +29,6 @@ import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
-import kotlinx.coroutines.delay
 
 /** An icon in a top bar, with a target a thumb can find. */
 @Composable
@@ -178,13 +176,12 @@ internal fun FootButton(label: String, modifier: Modifier = Modifier.fillMaxWidt
     }
 }
 
-/** A short thing to say, along the foot, gone after a few seconds. */
+/**
+ * A short thing to say, along the foot. It stays until the next press anywhere ([Frame]) or a
+ * press on it: on this panel a message on a timer could be gone before it was read.
+ */
 @Composable
 internal fun NoticeStrip(text: String, onSeen: () -> Unit) {
-    LaunchedEffect(text) {
-        delay(5000)
-        onSeen()
-    }
     HorizontalDividerMMD()
     TextMMD(
         text = text,
