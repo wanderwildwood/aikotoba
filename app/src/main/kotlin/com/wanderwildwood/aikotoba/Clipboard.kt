@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PersistableBundle
@@ -37,11 +38,15 @@ object Clipboard {
         handler.removeCallbacksAndMessages(TOKEN)
         handler.postAtTime({ clearNow(app) }, TOKEN, SystemClock.uptimeMillis() + SECONDS * 1000L)
         runCatching {
-            app.getSystemService(AlarmManager::class.java).setExactAndAllowWhileIdle(
-                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + SECONDS * 1000L,
-                pending(app),
-            )
+            val alarms = app.getSystemService(AlarmManager::class.java)
+            val at = SystemClock.elapsedRealtime() + SECONDS * 1000L
+            // Android 12 and later can take away the leave to set an alarm to the second. Without
+            // it the clipboard is still emptied by an alarm, a little late rather than not at all.
+            if (Build.VERSION.SDK_INT < 31 || alarms.canScheduleExactAlarms()) {
+                alarms.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(app))
+            } else {
+                alarms.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, at, pending(app))
+            }
         }
         Toast.makeText(app, app.getString(R.string.copied, label, SECONDS.toString()), Toast.LENGTH_SHORT).show()
     }
