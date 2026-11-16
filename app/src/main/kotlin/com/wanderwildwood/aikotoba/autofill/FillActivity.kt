@@ -54,6 +54,7 @@ import com.wanderwildwood.aikotoba.ui.ArmedScope
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
+import com.wanderwildwood.aikotoba.ui.DarkSelection
 
 /**
  * Opened from another app's sign-in screen: unlock if need be, choose the entry, and its user
@@ -79,7 +80,7 @@ class FillActivity : ComponentActivity() {
         }.getOrDefault(fields.packageName)
         setContent {
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-            ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+            ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                 ArmedScope {
                     val open by Session.state.collectAsState()
                     val prefs = remember { Prefs(this) }
@@ -91,7 +92,7 @@ class FillActivity : ComponentActivity() {
                         else -> UnlockScreen(uri = target!!, visiting = false, onOther = { prefs.vault = it; target = it }, onNew = {}, onAbout = null)
                     }
                 }
-            }
+            } }
             }
         }
     }

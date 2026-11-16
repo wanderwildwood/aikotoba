@@ -14,6 +14,7 @@ import com.wanderwildwood.aikotoba.ui.App
 import com.wanderwildwood.aikotoba.ui.houseTypography
 import com.wanderwildwood.aikotoba.ui.monochrome
 import com.wanderwildwood.aikotoba.ui.ArmedScope
+import com.wanderwildwood.aikotoba.ui.DarkSelection
 
 /**
  * The app's one window. Also where a vault file opened from Files arrives, and links or
@@ -30,9 +31,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             // A steady cursor: a blinking one is a repaint twice a second on an e-ink panel
             CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
-                ThemeMMD(colorScheme = monochrome, typography = houseTypography) {
+                ThemeMMD(colorScheme = monochrome, typography = houseTypography) { DarkSelection {
                     ArmedScope { App(incoming = incoming.value, onIncomingTaken = { incoming.value = null }) }
-                }
+                } }
             }
         }
     }
