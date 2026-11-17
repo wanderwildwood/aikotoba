@@ -219,7 +219,8 @@ private fun TypeSecret(issuer: String, account: String, onBack: () -> Unit, onDo
         PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
             item { Line(stringResource(R.string.type_issuer), name) { name = it } }
             item { Line(stringResource(R.string.type_account), user) { user = it } }
-            item { Line(stringResource(R.string.type_secret), secret, KeyboardCapitalization.Characters) { secret = it } }
+            // A password keyboard, so the keyboard learns nothing of the secret; it stays readable here.
+            item { Line(stringResource(R.string.type_secret), secret, KeyboardCapitalization.Characters, KeyboardType.Password) { secret = it } }
             if (secret.isNotBlank() && !valid) item { Say(stringResource(R.string.type_secret_bad), bold = true) }
             item {
                 SettingsRow(stringResource(R.string.type_digits), digits.toString()) { digits = if (digits == 6) 8 else 6 }
@@ -240,14 +241,20 @@ private fun TypeSecret(issuer: String, account: String, onBack: () -> Unit, onDo
 }
 
 @Composable
-private fun Line(label: String, value: String, caps: KeyboardCapitalization = KeyboardCapitalization.Sentences, onValue: (String) -> Unit) {
+private fun Line(
+    label: String,
+    value: String,
+    caps: KeyboardCapitalization = KeyboardCapitalization.Sentences,
+    type: KeyboardType = KeyboardType.Text,
+    onValue: (String) -> Unit,
+) {
     Column(Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
         TextMMD(text = label, style = MaterialTheme.typography.labelSmall)
         TextFieldMMD(
             value = value,
             onValueChange = onValue,
             singleLine = true,
-            keyboardOptions = KeyboardOptions(capitalization = caps, autoCorrectEnabled = false, imeAction = ImeAction.Next),
+            keyboardOptions = KeyboardOptions(capitalization = caps, autoCorrectEnabled = false, keyboardType = type, imeAction = ImeAction.Next),
             modifier = Modifier.fillMaxWidth(),
         )
     }
