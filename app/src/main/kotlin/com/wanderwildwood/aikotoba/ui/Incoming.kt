@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import com.wanderwildwood.aikotoba.importer.Import
 import com.wanderwildwood.aikotoba.importer.Recognised
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /** What another app handed over: a vault file to open, or codes (a link, a QR picture, an export). */
 object Incoming {
@@ -16,7 +18,20 @@ object Incoming {
         object Nothing : What()
     }
 
-    /** Blocking only for a picture, which is read for its QR code; called from a coroutine. */
+    private const val SHARED_FILE_CAP = 8 * 1024 * 1024
+
+    private fun readAtMost(input: java.io.InputStream, limit: Int): ByteArray {
+        val out = java.io.ByteArrayOutputStream()
+        val buf = ByteArray(64 * 1024)
+        while (out.size() < limit) {
+            val n = input.read(buf, 0, minOf(buf.size, limit - out.size()))
+            if (n < 0) break
+            out.write(buf, 0, n)
+        }
+        return out.toByteArray()
+    }
+
+    /** Files and pictures are read off the main thread; called from a coroutine. */
     suspend fun read(context: Context, intent: Intent): What = when (intent.action) {
         Intent.ACTION_VIEW -> {
             val uri = intent.data
@@ -39,10 +54,15 @@ object Incoming {
             when {
                 text != null -> What.Codes(Import.recognise(text))
                 stream != null && intent.type.orEmpty().startsWith("image/") -> What.Codes(readPicture(context, stream))
+                // Off the main thread, and no bigger than an export of codes can be.
                 stream != null -> What.Codes(
-                    runCatching {
-                        Import.recognise(context.contentResolver.openInputStream(stream)!!.use { it.readBytes().toString(Charsets.UTF_8) })
-                    }.getOrDefault(Recognised.Nothing),
+                    withContext(Dispatchers.IO) {
+                        runCatching {
+                            val bytes = context.contentResolver.openInputStream(stream)!!.use { readAtMost(it, SHARED_FILE_CAP + 1) }
+                            if (bytes.size > SHARED_FILE_CAP) Recognised.Nothing
+                            else Import.recognise(bytes.toString(Charsets.UTF_8))
+                        }.getOrDefault(Recognised.Nothing)
+                    },
                 )
                 else -> What.Nothing
             }
