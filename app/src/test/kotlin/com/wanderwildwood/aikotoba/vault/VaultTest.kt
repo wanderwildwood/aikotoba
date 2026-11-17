@@ -87,4 +87,16 @@ class VaultTest {
         assertEquals(null, again.otp)
         assertEquals("p", Vault.password(back, wiki.uuid))
     }
+
+    @Test
+    fun `a code this app cannot read survives an edit`() {
+        var db = open()
+        val (added, id) = Vault.add(db, Draft("Ada's Garden", "ada", "s3cret", "garden.example.org", "", ""))
+        db = Vault.setOtp(added, id, "key=JBSWY3DPEHPK3PXP&step=30&size=6")
+        assertEquals(null, Vault.items(db).first { it.uuid == id }.otp)
+        db = Vault.update(db, id, Draft("Ada's Garden", "ada", "n3w", "garden.example.org", "a note", ""))
+        val back = roundTrip(db)
+        assertEquals("key=JBSWY3DPEHPK3PXP&step=30&size=6", Vault.items(back).first { it.uuid == id }.extra["otp"])
+        assertEquals("n3w", Vault.password(back, id))
+    }
 }

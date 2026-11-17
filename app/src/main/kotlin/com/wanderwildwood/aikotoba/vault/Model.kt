@@ -128,7 +128,16 @@ object Vault {
             (BasicField.Password() to EntryValue.Encrypted(EncryptedValue.fromString(draft.password))) +
             (BasicField.Url() to EntryValue.Plain(draft.url.trim())) +
             (BasicField.Notes() to EntryValue.Plain(draft.notes))
-        return withOtp(base, draft.otp.trim())
+        val link = draft.otp.trim()
+        // A code this app cannot read is shown as none, so an empty one here is not a removal.
+        if (link.isEmpty() && hasUnreadableOtp(old)) return base
+        return withOtp(base, link)
+    }
+
+    private fun hasUnreadableOtp(fields: EntryFields): Boolean {
+        val plain = fields.entries.associate { it.key to it.value.content }
+        val present = listOf(OtpField.KEY, OtpField.LEGACY_SEED).any { !plain[it].isNullOrBlank() }
+        return present && OtpField.read(plain) == null
     }
 
     private fun withOtp(fields: EntryFields, link: String): EntryFields {
