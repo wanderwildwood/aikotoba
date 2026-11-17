@@ -39,7 +39,10 @@ data class Fields(
             // so "the box above the password" is decided by position, not by order.
             val top = HashMap<AssistStructure.ViewNode, Int>()
             var domain: String? = null
-            fun walk(node: AssistStructure.ViewNode, y: Int) {
+            // The site each field belongs to: the nearest webDomain above it, so a sign-in box in
+            // a frame from another site is matched to that site, not to the page around it.
+            val siteOf = HashMap<AssistStructure.ViewNode, String?>()
+            fun walk(node: AssistStructure.ViewNode, y: Int, site: String?) {
                 val here = y + node.top - node.scrollY
                 if (com.wanderwildwood.aikotoba.BuildConfig.DEBUG) {
                     // The shape of the other app's screen, never what is in its fields.
@@ -50,13 +53,15 @@ data class Fields(
                     )
                 }
                 if (domain == null && !node.webDomain.isNullOrBlank()) domain = node.webDomain
+                val nodeSite = node.webDomain?.takeIf { it.isNotBlank() } ?: site
                 if (node.autofillId != null && node.autofillType == View.AUTOFILL_TYPE_TEXT && node.visibility == View.VISIBLE) {
                     nodes += node
                     top[node] = here
+                    siteOf[node] = nodeSite
                 }
-                for (i in 0 until node.childCount) walk(node.getChildAt(i), here)
+                for (i in 0 until node.childCount) walk(node.getChildAt(i), here, nodeSite)
             }
-            for (i in 0 until structure.windowNodeCount) walk(structure.getWindowNodeAt(i).rootViewNode, 0)
+            for (i in 0 until structure.windowNodeCount) walk(structure.getWindowNodeAt(i).rootViewNode, 0, null)
 
             var user = nodes.firstOrNull { kind(it) == Kind.USER }
             val pass = nodes.firstOrNull { kind(it) == Kind.PASSWORD }
@@ -68,7 +73,10 @@ data class Fields(
                 // A first page that asks only for the account ("Next" before the password).
                 user = nodes.singleOrNull { kind(it) == Kind.TEXT && looksLikeAccount(it) }
             }
-            return Fields(user?.autofillId, pass?.autofillId, structure.activityComponent.packageName, domain)
+            // A user name box from another site than the password box is not filled with it.
+            if (user != null && pass != null && siteOf[user] != null && siteOf[pass] != null && siteOf[user] != siteOf[pass]) user = null
+            val fieldSite = (pass ?: user)?.let { siteOf[it] }
+            return Fields(user?.autofillId, pass?.autofillId, structure.activityComponent.packageName, fieldSite ?: domain)
         }
 
         private enum class Kind { USER, PASSWORD, TEXT, OTHER }
