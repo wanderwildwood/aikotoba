@@ -46,9 +46,9 @@ import kotlinx.coroutines.withContext
 
 /** Nothing chosen yet: open a vault file, or make one. */
 @Composable
-fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: (() -> Unit)?, onGenerate: (() -> Unit)? = null) {
+fun StartScreen(onOpened: (Uri) -> Unit, onNew: ((Uri) -> Unit)?, onAbout: (() -> Unit)?, onGenerate: (() -> Unit)? = null) {
     val pick = rememberVaultPicker(onOpened)
-    val make = rememberFileMaker(onNew)
+    val make = rememberFileMaker { onNew?.invoke(it) }
     val newName = stringResource(R.string.new_vault_file_name)
     Frame(
         title = stringResource(R.string.app_name),
@@ -60,8 +60,10 @@ fun StartScreen(onOpened: (Uri) -> Unit, onNew: (Uri) -> Unit, onAbout: (() -> U
             item {
                 Column(Modifier.padding(16.dp)) {
                     FootButton(stringResource(R.string.start_open), onClick = pick)
-                    Spacer(Modifier.height(12.dp))
-                    FootButton(stringResource(R.string.start_new)) { make(newName) }
+                    if (onNew != null) {
+                        Spacer(Modifier.height(12.dp))
+                        FootButton(stringResource(R.string.start_new)) { make(newName) }
+                    }
                 }
             }
             if (onGenerate != null) item { PlainRow(stringResource(R.string.gen_open), onPress = onGenerate) }
@@ -79,7 +81,7 @@ fun UnlockScreen(
     uri: Uri,
     visiting: Boolean,
     onOther: (Uri) -> Unit,
-    onNew: (Uri) -> Unit,
+    onNew: ((Uri) -> Unit)?,
     onAbout: (() -> Unit)?,
     onUnlocked: () -> Unit = {},
     onGenerate: (() -> Unit)? = null,
@@ -203,7 +205,7 @@ fun UnlockScreen(
     }
 
     val pickOther = rememberVaultPicker(onOther)
-    val make = rememberFileMaker(onNew)
+    val make = rememberFileMaker { onNew?.invoke(it) }
     val newName = stringResource(R.string.new_vault_file_name)
     val pickKey = rememberOnePicker { u ->
         scope.launch {
@@ -287,7 +289,7 @@ fun UnlockScreen(
             }
             item { Spacer(Modifier.height(16.dp)) }
             item { PlainRow(stringResource(R.string.unlock_other), onPress = pickOther) }
-            item { PlainRow(stringResource(R.string.start_new), onPress = { make(newName) }) }
+            if (onNew != null) item { PlainRow(stringResource(R.string.start_new), onPress = { make(newName) }) }
             if (onGenerate != null) item { PlainRow(stringResource(R.string.gen_open), onPress = onGenerate) }
         }
     }
