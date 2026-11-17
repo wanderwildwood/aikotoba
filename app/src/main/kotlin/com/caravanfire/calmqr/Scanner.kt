@@ -33,6 +33,8 @@ import android.graphics.Paint
 import android.util.Size
 import android.view.HapticFeedbackConstants
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -84,6 +86,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
 import com.google.zxing.qrcode.detector.Detector
 import com.mudita.mmd.components.text.TextMMD
+import com.wanderwildwood.aikotoba.ui.DarkMode
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlinx.coroutines.delay
@@ -223,7 +226,13 @@ fun QrScanner(
                         unavailable()
                     }
                 }, ContextCompat.getMainExecutor(ctx))
-                previewView
+                // The camera's picture keeps its own colors in dark mode. The preview has a grey
+                // layer of its own, so the keep goes on a frame around it rather than on it.
+                FrameLayout(ctx).apply {
+                    (previewView.parent as? ViewGroup)?.removeView(previewView)
+                    addView(previewView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+                    DarkMode.keep(this)
+                }
             },
             modifier = Modifier
                 .fillMaxSize()
