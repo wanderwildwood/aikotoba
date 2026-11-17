@@ -63,7 +63,11 @@ class VaultFile(private val context: Context, val uri: Uri) {
         }
         if (expected != null && !sha256(current).contentEquals(expected)) return Saved.Changed
 
-        try {
+        // After a save that was cut short, the file is suspect and the copy kept from before is
+        // the good one: it is not replaced by the file now there, whatever this write is (putting
+        // that copy back, or a save over the file).
+        val suspect = Pending.interrupted(context, uri, current)
+        if (!suspect) try {
             keepPrevious(current)
         } catch (e: Exception) {
             // Without the copy from before, the save does not go ahead: a failure halfway would
@@ -95,7 +99,7 @@ class VaultFile(private val context: Context, val uri: Uri) {
         }.getOrDefault(false)
         // Put back and checked: nothing is left half done. Not put back: the note stays, and the
         // next open offers the copy from before.
-        if (restored) Pending.end(context)
+        if (restored && !suspect) Pending.end(context)
         return Saved.Failed(problem, restored)
     }
 

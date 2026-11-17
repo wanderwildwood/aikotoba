@@ -272,7 +272,8 @@ fun UnlockScreen(
                                     val previous = VaultFile.previous(context, uri)
                                     previous != null && VaultFile(context, uri).write(previous, expected = null) is VaultFile.Saved.Done
                                 }
-                                interrupted = false
+                                // A failed put-back keeps the offer, so it can be tried again.
+                                if (ok) interrupted = false
                                 Notice.say(context.getString(if (ok) R.string.previous_put_back else R.string.previous_failed))
                             }
                         }
