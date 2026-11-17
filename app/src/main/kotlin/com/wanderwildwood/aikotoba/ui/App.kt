@@ -385,7 +385,9 @@ class Actions(
                 Session.Saved.Done -> Notice.say(context.getString(R.string.password_changed))
                 Session.Saved.ReadOnly -> Notice.say(context.getString(R.string.not_saved_read_only))
                 Session.Saved.Changed -> onConflict()
-                is Session.Saved.Failed -> Notice.say(context.getString(R.string.not_saved_failed, r.reason))
+                is Session.Saved.Failed -> Notice.say(
+                    context.getString(if (r.restored) R.string.not_saved_failed else R.string.not_saved_failed_unsure, r.reason),
+                )
             }
             then(r == Session.Saved.Done)
         }

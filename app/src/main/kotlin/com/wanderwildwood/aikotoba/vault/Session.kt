@@ -136,7 +136,16 @@ object Session {
      * whatever happens to the write, marked unsaved until a write succeeds, so nothing typed is
      * lost to a file that could not be reached.
      */
-    fun save(context: Context, force: Boolean = false, change: (KeePassDatabase) -> KeePassDatabase): Saved {
+    fun save(context: Context, force: Boolean = false, change: (KeePassDatabase) -> KeePassDatabase): Saved =
+        synchronized(writing) { saveNow(context, force, change) }
+
+    /**
+     * One write to the vault file at a time: a save started while another is still encoding waits
+     * for it, and so starts from the state and the file's hash that save left.
+     */
+    private val writing = Any()
+
+    private fun saveNow(context: Context, force: Boolean, change: (KeePassDatabase) -> KeePassDatabase): Saved {
         val current = _state.value ?: return Saved.Failed("the vault is locked", restored = true)
         val db = change(current.db)
         val pending = Open(current.uri, current.name, db, current.hash, current.writable, unsaved = true, keyFile = current.keyFile, passphrase = current.passphrase)
@@ -164,7 +173,9 @@ object Session {
      * The open vault, unsaved changes and all, written to a new file at [uri], which then becomes
      * the vault. For a vault that came read-only (a server through Files) and has changes to keep.
      */
-    fun saveAs(context: Context, uri: Uri): Saved {
+    fun saveAs(context: Context, uri: Uri): Saved = synchronized(writing) { saveAsNow(context, uri) }
+
+    private fun saveAsNow(context: Context, uri: Uri): Saved {
         val current = _state.value ?: return Saved.Failed("the vault is locked", restored = true)
         val bytes = try {
             encode(current.db)
@@ -183,7 +194,9 @@ object Session {
     }
 
     /** Throw away what is in memory and read the file again, with the same password. */
-    fun reload(context: Context): Opened {
+    fun reload(context: Context): Opened = synchronized(writing) { reloadNow(context) }
+
+    private fun reloadNow(context: Context): Opened {
         val current = _state.value ?: return Opened.Unreadable("the vault is locked")
         val file = VaultFile(context, current.uri)
         return try {
@@ -213,8 +226,12 @@ object Session {
     }
 
     /** A new master password; the file is written with it at once. */
-    fun changePassword(context: Context, password: String): Saved {
-        val r = save(context) { db ->
+    fun changePassword(context: Context, password: String): Saved =
+        synchronized(writing) { changePasswordNow(context, password) }
+
+    private fun changePasswordNow(context: Context, password: String): Saved {
+        val before = _state.value
+        val r = saveNow(context, force = false) { db ->
             val credentials = credentials(password, null)
             when (db) {
                 is KeePassDatabase.Ver3x -> db.copy(credentials = credentials)
@@ -225,6 +242,11 @@ object Session {
             _state.value?.let { c ->
                 _state.value = Open(c.uri, c.name, c.db, c.hash, c.writable, c.unsaved, c.keyFile, EncryptedValue.fromString(password))
             }
+        } else if (before != null && _state.value?.uri == before.uri) {
+            // All or nothing: a password not written to the file is not kept in memory either,
+            // or a later save of anything else would change it unasked, and Reload could not open
+            // the file with it.
+            _state.value = before
         }
         return r
     }
