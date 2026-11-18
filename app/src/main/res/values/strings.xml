@@ -115,7 +115,7 @@
     <string name="saved">Saved.</string>
     <string name="not_saved_read_only">Not saved: this file is read only. The change is kept while the vault is open; press the line at the top of the list to save it to a file you choose.</string>
     <string name="not_saved_failed">Not saved: %1$s. The file is as it was, and the change is kept while the vault stays open.</string>
-    <string name="save_waits_for_other">another vault\'s last save did not finish, and the copy kept from before it is that vault\'s way back. Open that vault (Open a different vault) and put its copy back or leave its file as it is; then this one saves</string>
+    <string name="save_waits_for_other">the last save of another vault, %1$s, did not finish, and the copy kept from before it is that vault\'s way back. Open %1$s (Open a different vault) and put its copy back or leave its file as it is; then this one saves</string>
     <string name="vault_no_answer">no app answered for the file</string>
     <string name="vault_too_large">the file is too large to be a vault</string>
     <string name="save_keep_failed">the copy from before could not be kept inside the app</string>

@@ -89,8 +89,10 @@ class VaultFile(private val context: Context, val uri: Uri) {
         // Another vault's save was cut short and the copy kept is that vault's only good one:
         // this save would replace both the copy and the note, so it waits until that vault is
         // opened again and its copy put back or the file left as it is.
-        if (!suspect && Pending.waitingElsewhere(context, uri)) {
-            return Saved.Failed(context.getString(R.string.save_waits_for_other), restored = true)
+        val waitingFor = if (suspect) null else Pending.waitingElsewhere(context, uri)
+        if (waitingFor != null) {
+            val other = VaultFile(context, waitingFor).name()
+            return Saved.Failed(context.getString(R.string.save_waits_for_other, other), restored = true)
         }
         if (!suspect) try {
             keepPrevious(current)
@@ -235,21 +237,21 @@ class VaultFile(private val context: Context, val uri: Uri) {
         }
 
         /**
-         * Whether the note is for another file than [uri], that file's save is still not seen to
-         * have finished, and the copy from before kept for it is still here. The other file is
-         * read to see: a save that did finish clears the note. A note with no copy left (the
-         * vault was closed) offers nothing and is dropped.
+         * The other file, if the note is for another file than [uri], that file's save is still
+         * not seen to have finished, and the copy from before kept for it is still here; null
+         * otherwise. The other file is read to see: a save that did finish clears the note. A
+         * note with no copy left (the vault was closed) offers nothing and is dropped.
          */
-        fun waitingElsewhere(context: Context, uri: Uri): Boolean {
-            val other = prefs(context).getString("uri", null) ?: return false
-            if (other == uri.toString()) return false
+        fun waitingElsewhere(context: Context, uri: Uri): Uri? {
+            val other = prefs(context).getString("uri", null) ?: return null
+            if (other == uri.toString()) return null
             val otherUri = Uri.parse(other)
             if (previous(context, otherUri) == null) {
                 end(context)
-                return false
+                return null
             }
             val bytes = runCatching { VaultFile(context, otherUri).read() }.getOrNull()
-            return interrupted(context, otherUri, bytes)
+            return if (interrupted(context, otherUri, bytes)) otherUri else null
         }
 
         /**
