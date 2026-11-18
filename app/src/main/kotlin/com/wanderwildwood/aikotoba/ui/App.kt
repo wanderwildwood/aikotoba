@@ -129,6 +129,10 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
     }
 
     val actions = remember { Actions(context, scope, onConflict = { conflict = true }) }
+    // A lock closes the conflict dialog: the new password a change met it with goes too.
+    LaunchedEffect(open == null) {
+        if (open == null) actions.forgetConflict()
+    }
     val onAbout = { about = true }
     val vault = open
 
@@ -345,10 +349,10 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
             if (conflict) {
                 ConflictDialog(
                     actions = actions,
-                    onReload = { conflict = false; actions.reload() },
+                    onReload = { conflict = false; actions.forgetConflict(); actions.reload() },
                     onReplace = { conflict = false; actions.replace(context.getString(R.string.saved)) },
-                    onCopy = { conflict = false },
-                    onDismiss = { conflict = false },
+                    onCopy = { conflict = false; actions.forgetConflict() },
+                    onDismiss = { conflict = false; actions.forgetConflict() },
                 )
             }
         }
@@ -402,6 +406,11 @@ class Actions(
      * or clears it.
      */
     private var conflictedPassword: Pair<String, (Boolean) -> Unit>? = null
+
+    /** The conflict dialog closed without Replace: the new password it held is not kept. */
+    fun forgetConflict() {
+        conflictedPassword = null
+    }
 
     /** The conflict dialog's Replace: the change that met it, written over the file as it now is. */
     fun replace(done: String) {
