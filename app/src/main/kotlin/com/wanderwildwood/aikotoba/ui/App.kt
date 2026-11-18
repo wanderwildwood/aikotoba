@@ -96,24 +96,28 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
     LaunchedEffect(incoming) {
         val intent = incoming ?: return@LaunchedEffect
         onIncomingTaken()
-        when (val what = Incoming.read(context, intent)) {
-            is Incoming.What.VaultFile -> {
-                // Another app's file is opened for now only, and never in place of the vault
-                // already here without a yes.
-                if (Incoming.asksFirst(open?.uri ?: target, what.uri)) {
-                    handed = what.uri
-                } else if (open?.uri != what.uri) {
-                    target = what.uri
-                    visiting = what.uri != prefs.vault
+        // Read in the screen's own scope, not this effect's: taking the intent changes the key
+        // this effect runs under, and that would cancel a read still going (a picture, a file).
+        scope.launch {
+            when (val what = Incoming.read(context, intent)) {
+                is Incoming.What.VaultFile -> {
+                    // Another app's file is opened for now only, and never in place of the vault
+                    // already here without a yes.
+                    if (Incoming.asksFirst(open?.uri ?: target, what.uri)) {
+                        handed = what.uri
+                    } else if (open?.uri != what.uri) {
+                        target = what.uri
+                        visiting = what.uri != prefs.vault
+                    }
                 }
+                is Incoming.What.Codes -> when (val r = what.recognised) {
+                    is Recognised.Codes -> if (open != null) stack.add(Route.Review(r.found)) else waiting = r.found
+                    is Recognised.KauthBackup -> if (open != null) stack.add(Route.Kauth(r.blob, null)) else waitingBlob = r.blob
+                    Recognised.AegisEncrypted -> Notice.say(context.getString(R.string.import_aegis_encrypted))
+                    Recognised.Nothing -> Notice.say(context.getString(R.string.import_nothing))
+                }
+                Incoming.What.Nothing -> Unit
             }
-            is Incoming.What.Codes -> when (val r = what.recognised) {
-                is Recognised.Codes -> if (open != null) stack.add(Route.Review(r.found)) else waiting = r.found
-                is Recognised.KauthBackup -> if (open != null) stack.add(Route.Kauth(r.blob, null)) else waitingBlob = r.blob
-                Recognised.AegisEncrypted -> Notice.say(context.getString(R.string.import_aegis_encrypted))
-                Recognised.Nothing -> Notice.say(context.getString(R.string.import_nothing))
-            }
-            Incoming.What.Nothing -> Unit
         }
     }
 
