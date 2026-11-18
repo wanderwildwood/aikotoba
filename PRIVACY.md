@@ -54,7 +54,9 @@ data-extraction rules that exclude everything).
 - **A vault file opened from another app** (Files, a mail app) is opened for now only. If a
   different vault is open or waiting to be unlocked, Passwords asks first, and that vault stays
   the one it remembers. Only content addresses are taken, never a bare `file://` path.
-- **The clipboard.** What you copy is marked sensitive and cleared after thirty seconds.
+- **The clipboard.** A password, user name or code copied with its Copy button is marked
+  sensitive and cleared after thirty seconds. Text you select yourself (in a note, or while
+  editing) and copy goes to the clipboard the ordinary way, and stays there.
 
 No screen of the app can be captured in a screenshot or shown in Recents (`FLAG_SECURE`), and
 none of its fields are offered to any autofill service, its own included.
