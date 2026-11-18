@@ -289,6 +289,7 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                 )
                 Route.Settings -> SettingsScreen(
                     open = vault,
+                    visiting = visiting,
                     prefs = prefs,
                     onBack = back,
                     onChangePassword = { stack.add(Route.ChangePassword) },
@@ -302,10 +303,17 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                     },
                     onClose = {
                         Session.lock()
-                        VaultFile.forgetPrevious(context)
-                        Fingerprint.forget(context)
-                        prefs.vault = null
-                        target = null
+                        if (visiting) {
+                            // A file opened for now: closing it leaves the remembered vault, its
+                            // fingerprint key and its copy from before as they are.
+                            target = prefs.vault
+                            visiting = false
+                        } else {
+                            VaultFile.forgetPrevious(context)
+                            Fingerprint.forget(context)
+                            prefs.vault = null
+                            target = null
+                        }
                     },
                     actions = actions,
                     onAbout = onAbout,

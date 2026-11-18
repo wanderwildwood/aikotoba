@@ -42,6 +42,8 @@ import androidx.compose.ui.state.ToggleableState
 @Composable
 fun SettingsScreen(
     open: Session.Open,
+    /** A file opened for now from another app, not the remembered vault. */
+    visiting: Boolean,
     prefs: Prefs,
     onBack: () -> Unit,
     onChangePassword: () -> Unit,
@@ -133,7 +135,9 @@ fun SettingsScreen(
                 )
             }
             item { Say(stringResource(R.string.settings_lock_note)) }
-            item {
+            // One fingerprint key, kept for the remembered vault: a file opened for now does not
+            // take it over.
+            if (!visiting) item {
                 val can = fingerprints is Fingerprint.Available.Yes
                 SettingsRow(
                     title = stringResource(R.string.settings_fingerprint),
