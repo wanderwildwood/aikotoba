@@ -202,7 +202,7 @@
     <string name="settings_copy">Save a copy</string>
     <string name="settings_copy_note">The file is the only copy of the vault, and a copy of it is the backup. It stays locked with the same master password.</string>
     <string name="settings_previous">Put back the file from before the last save</string>
-    <string name="settings_previous_note">Each save keeps the file as it was, inside this app, until the next.</string>
+    <string name="settings_previous_note">Each save keeps the file as it was, inside this app, until the next. It opens with the master password it had then: after a password change, putting it back brings the old password back.</string>
     <string name="settings_previous_armed">Put back — this replaces the vault file; tap again</string>
     <string name="previous_put_back">The file from before the last save is back. Unlock to see it.</string>
     <string name="previous_failed">The copy from before could not be put back.</string>

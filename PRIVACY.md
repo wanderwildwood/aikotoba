@@ -29,7 +29,10 @@ What is kept inside the app:
 - **Its settings**: which file is the vault, how long until it locks, which list opens first, and
   the password generator's choices. No password, key or entry.
 - **The vault file as it was before the last save**, which is as encrypted as the file itself, so
-  a save that goes wrong can be undone. It is deleted when its vault is closed in Settings.
+  a save that goes wrong can be undone. It opens with the master password the file had then:
+  after a password change it still opens with the old one until the next save replaces it, and
+  putting it back brings the old password back with it. It is deleted when its vault is closed
+  in Settings.
   Closing a file opened for now from another app only locks it and goes back to the remembered
   vault, keeping that vault's copy and fingerprint key.
   Choosing a different vault keeps it (it is still the old vault's way back) until a vault is

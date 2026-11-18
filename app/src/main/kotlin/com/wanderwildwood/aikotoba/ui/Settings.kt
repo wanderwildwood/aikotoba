@@ -110,7 +110,7 @@ fun SettingsScreen(
                         title = stringResource(if (armed) R.string.settings_previous_armed else R.string.settings_previous),
                         note = if (armed) null else stringResource(R.string.settings_previous_note),
                         bold = armed,
-                        noteLines = 3,
+                        noteLines = 5,
                         onPress = press,
                     )
                 }
