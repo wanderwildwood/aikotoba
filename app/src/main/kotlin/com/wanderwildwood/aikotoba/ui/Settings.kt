@@ -88,11 +88,19 @@ fun SettingsScreen(
         PagedColumn(Modifier.fillMaxSize()) {
             item { SettingsHeading(stringResource(R.string.settings_vault)) }
             item {
+                // Another vault locks this one, and a change not yet in its file is lost with it,
+                // so with one waiting the row asks first.
+                val (armed, press) = rememberArmed("other") { pickOther() }
                 SettingsRow(
-                    title = stringResource(R.string.settings_file),
-                    note = if (open.writable) open.name else stringResource(R.string.settings_file_read_only, open.name),
+                    title = stringResource(if (armed) R.string.settings_other_unsaved_armed else R.string.settings_file),
+                    note = when {
+                        armed -> null
+                        open.writable -> open.name
+                        else -> stringResource(R.string.settings_file_read_only, open.name)
+                    },
+                    bold = armed,
                     noteLines = 3,
-                    onPress = pickOther,
+                    onPress = if (open.unsaved) press else pickOther,
                 )
             }
             item {
@@ -228,7 +236,14 @@ fun SettingsScreen(
 
             item { Spacer(Modifier.height(16.dp)) }
             item {
-                SettingsRow(stringResource(R.string.settings_close), stringResource(R.string.settings_close_note), noteLines = 3, onPress = onClose)
+                val (armed, press) = rememberArmed("close") { onClose() }
+                SettingsRow(
+                    title = stringResource(if (armed) R.string.settings_close_unsaved_armed else R.string.settings_close),
+                    note = if (armed) null else stringResource(R.string.settings_close_note),
+                    bold = armed,
+                    noteLines = 3,
+                    onPress = if (open.unsaved) press else onClose,
+                )
             }
         }
     }

@@ -78,6 +78,7 @@
     <string name="code_next">Show the next code</string>
     <string name="code_unreadable">Code unreadable</string>
     <string name="unsaved_retry">Not saved to the file yet. Press to try again.</string>
+    <string name="unsaved_lock_armed">Locking now loses the change not saved to the file. Press the lock again to lock anyway.</string>
     <string name="unsaved_read_only">Changes are not saved: this file is read only. Press to save the vault to a file of your choosing; it becomes the vault from then on.</string>
     <string name="read_only_strip">Read only: this file came from somewhere this app cannot write to. Press to save to another file if you want to make changes.</string>
     <string name="saved_to_new_file">Saved to the new file. That file is the vault now.</string>
@@ -248,6 +249,8 @@
     <string name="settings_bring_in_note">From kAuth, Aegis, Google Authenticator, or otpauth:// links.</string>
     <string name="settings_close">Close this vault</string>
     <string name="settings_close_note">The file stays where it is; this app just stops opening it.</string>
+    <string name="settings_close_unsaved_armed">Close — the change not saved to the file is lost; tap again</string>
+    <string name="settings_other_unsaved_armed">Open a different vault — the change not saved to the file is lost; tap again</string>
     <string name="copy_saved">Copy saved.</string>
     <string name="copy_failed">The copy could not be saved.</string>
 

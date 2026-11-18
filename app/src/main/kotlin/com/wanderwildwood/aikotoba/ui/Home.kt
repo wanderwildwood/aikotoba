@@ -93,10 +93,13 @@ fun HomeScreen(
         timed.any { it.period == 30 } -> 30
         else -> timed.map { it.period }.distinct().singleOrNull() ?: 30
     }
+    // A change not yet in the file is lost when the vault locks, so with one waiting the lock
+    // asks first: the first press says so in the line at the top, the second locks.
+    val (lockArmed, lockPress) = rememberArmed("lock") { Session.lock() }
     Frame(
         title = stringResource(R.string.app_name),
         actions = {
-            BarButton(Icons.Lock, stringResource(R.string.cd_lock)) { Session.lock() }
+            BarButton(Icons.Lock, stringResource(R.string.cd_lock)) { if (open.unsaved) lockPress() else Session.lock() }
             BarButton(Icons.Settings, stringResource(R.string.cd_settings), onSettings)
         },
         floating = {
@@ -117,6 +120,7 @@ fun HomeScreen(
             TextMMD(
                 text = stringResource(
                     when {
+                        lockArmed && open.unsaved -> R.string.unsaved_lock_armed
                         !open.writable && open.unsaved -> R.string.unsaved_read_only
                         !open.writable -> R.string.read_only_strip
                         else -> R.string.unsaved_retry
