@@ -266,13 +266,16 @@ object Session {
         return Fingerprint.Secret(password, current.keyFile)
     }
 
-    /** A new master password; the file is written with it at once. */
-    fun changePassword(context: Context, password: String): Saved =
-        synchronized(writing) { changePasswordNow(context, password) }
+    /**
+     * A new master password; the file is written with it at once. [force]: over the file even if
+     * it changed elsewhere (the person chose Replace).
+     */
+    fun changePassword(context: Context, password: String, force: Boolean = false): Saved =
+        synchronized(writing) { changePasswordNow(context, password, force) }
 
-    private fun changePasswordNow(context: Context, password: String): Saved {
+    private fun changePasswordNow(context: Context, password: String, force: Boolean): Saved {
         val before = _state.value
-        val r = saveNow(context, force = false) { db ->
+        val r = saveNow(context, force) { db ->
             val credentials = credentials(password, null)
             when (db) {
                 is KeePassDatabase.Ver3x -> db.copy(credentials = credentials)

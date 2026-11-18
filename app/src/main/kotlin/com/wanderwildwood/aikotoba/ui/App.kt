@@ -330,7 +330,7 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                         onChange = { password ->
                             actions.changePassword(password) { changed ->
                                 if (!changed) return@changePassword
-                                back()
+                                if (stack.lastOrNull() == Route.ChangePassword) back()
                                 // What fingerprint unlock keeps is the old password now; one reading keeps the new.
                                 if (Fingerprint.enrolledFor(context, vault.uri)) {
                                     enrolFingerprint(context, vault.uri, keepTitle, keepSubtitle) { kept ->
@@ -346,7 +346,7 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                 ConflictDialog(
                     actions = actions,
                     onReload = { conflict = false; actions.reload() },
-                    onReplace = { conflict = false; actions.save(context.getString(R.string.saved), force = true) { it } },
+                    onReplace = { conflict = false; actions.replace(context.getString(R.string.saved)) },
                     onCopy = { conflict = false },
                     onDismiss = { conflict = false },
                 )
@@ -396,6 +396,21 @@ class Actions(
     var busy by mutableStateOf(false)
         private set
 
+    /**
+     * The password change that met a file changed elsewhere, if that is what the conflict dialog
+     * is about: Replace then writes the new password, not the vault as it was. Each conflict sets
+     * or clears it.
+     */
+    private var conflictedPassword: Pair<String, (Boolean) -> Unit>? = null
+
+    /** The conflict dialog's Replace: the change that met it, written over the file as it now is. */
+    fun replace(done: String) {
+        val password = conflictedPassword
+        conflictedPassword = null
+        if (password != null) changePassword(password.first, force = true, then = password.second)
+        else save(done, force = true) { it }
+    }
+
     fun save(done: String? = null, force: Boolean = false, change: (KeePassDatabase) -> KeePassDatabase) {
         Notice.say(context.getString(R.string.saving))
         scope.launch {
@@ -405,6 +420,7 @@ class Actions(
                 Session.Saved.ReadOnly -> Notice.say(context.getString(R.string.not_saved_read_only))
                 Session.Saved.Changed -> {
                     Notice.text = null
+                    conflictedPassword = null
                     onConflict()
                 }
                 is Session.Saved.Failed -> Notice.say(
@@ -432,14 +448,18 @@ class Actions(
         }
     }
 
-    fun changePassword(password: String, then: (Boolean) -> Unit) {
+    fun changePassword(password: String, force: Boolean = false, then: (Boolean) -> Unit) {
         Notice.say(context.getString(R.string.saving))
         scope.launch {
-            val r = withContext(Dispatchers.IO) { Session.changePassword(context, password) }
+            val r = withContext(Dispatchers.IO) { Session.changePassword(context, password, force) }
             when (r) {
                 Session.Saved.Done -> Notice.say(context.getString(R.string.password_changed))
                 Session.Saved.ReadOnly -> Notice.say(context.getString(R.string.not_saved_read_only))
-                Session.Saved.Changed -> onConflict()
+                Session.Saved.Changed -> {
+                    Notice.text = null
+                    conflictedPassword = password to then
+                    onConflict()
+                }
                 is Session.Saved.Failed -> Notice.say(
                     context.getString(if (r.restored) R.string.not_saved_failed else R.string.not_saved_failed_unsure, r.reason),
                 )
