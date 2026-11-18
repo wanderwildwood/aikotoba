@@ -31,7 +31,9 @@ What is kept inside the app:
 - **The vault file as it was before the last save**, which is as encrypted as the file itself, so
   a save that goes wrong can be undone. It is deleted when the vault is closed in Settings.
   Choosing a different vault keeps it (it is still the old vault's way back) until a vault is
-  next saved, which replaces it with the copy from before that save.
+  next saved, which replaces it with the copy from before that save. After a save that was cut
+  short, the copy is that vault's way back, and no other vault is saved until it is put back or
+  the file is left as it is.
 - **With fingerprint unlock on, the master password encrypted** (AES-GCM) by a key that lives in
   the phone's hardware key store and never leaves it. That key can only be used right after a
   registered fingerprint is read, and the phone destroys it if a fingerprint is added or removed.

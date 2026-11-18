@@ -115,6 +115,7 @@
     <string name="saved">Saved.</string>
     <string name="not_saved_read_only">Not saved: this file is read only. The change is kept while the vault is open; press the line at the top of the list to save it to a file you choose.</string>
     <string name="not_saved_failed">Not saved: %1$s. The file is as it was, and the change is kept while the vault stays open.</string>
+    <string name="save_waits_for_other">another vault\'s last save did not finish, and the copy kept from before it is that vault\'s way back. Open that vault (Open a different vault) and put its copy back or leave its file as it is; then this one saves</string>
     <string name="not_saved_failed_unsure">Not saved: %1$s. The file may be damaged; the copy from before is kept, and Settings can put it back.</string>
     <string name="reload_failed">The newer file could not be opened with this vault\'s password.</string>
     <string name="conflict_what">The vault file changed since it was opened: another phone or computer saved it. This change is not in the file yet.</string>
