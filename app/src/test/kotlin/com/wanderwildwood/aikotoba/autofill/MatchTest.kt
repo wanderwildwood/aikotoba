@@ -36,4 +36,14 @@ class MatchTest {
         assertEquals("bank.example.com", Match.host("bank.example.com"))
         assertEquals(null, Match.host("androidapp://x.y"))
     }
+
+    @Test
+    fun `a pick is remembered only on an app's own screen`() {
+        assertTrue(Match.mayRemember(site = null, webDomain = null))
+        assertTrue(Match.mayRemember(site = null, webDomain = ""))
+        // A browser's page: matched by its address instead.
+        assertFalse(Match.mayRemember(site = "example.org", webDomain = "example.org"))
+        // A web page inside some other app.
+        assertFalse(Match.mayRemember(site = null, webDomain = "bank.example.org"))
+    }
 }

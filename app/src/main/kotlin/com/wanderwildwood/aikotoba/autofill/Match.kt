@@ -46,6 +46,14 @@ object Match {
     /** One host is the other, or sits inside it on a label boundary. */
     fun sameSite(a: String, b: String): Boolean = a == b || a.endsWith(".$b") || b.endsWith(".$a")
 
+    /**
+     * Whether a sign-in picked by hand may be remembered for the asking app. Only for an app's
+     * own screen: a browser's page is matched by its address, and a web page shown inside some
+     * other app ([webDomain] set, but no [site] believed) is not that app's own sign-in, so a
+     * pick made there is not written into the entry as a claim for the app.
+     */
+    fun mayRemember(site: String?, webDomain: String?): Boolean = site == null && webDomain.isNullOrBlank()
+
     /** The address to add to an entry so the app named by [packageName] finds it next time. */
     fun claim(packageName: String) = APP_SCHEME + packageName
 }

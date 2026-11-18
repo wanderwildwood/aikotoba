@@ -47,7 +47,8 @@ the backup.
 - **Fills sign-ins in other apps** (Android's autofill). Entries are offered to a page in a browser
   whose address is theirs, and to an app that the entry names; anything else is a search away,
   and a sign-in picked by hand can be remembered for that app. A web page shown inside some other
-  app counts as that app, since the app can read what is filled into it. While the vault is locked the offer is
+  app counts as that app, since the app can read what is filled into it, and a pick made on such a
+  page is not remembered for the app. While the vault is locked the offer is
   a single line that unlocks it.
 - **Locks itself** when the screen goes dark, and after a few minutes away from the app (on
   leaving, 1, 5 or 15 minutes). No screenshots, nothing in the Recents picture.
