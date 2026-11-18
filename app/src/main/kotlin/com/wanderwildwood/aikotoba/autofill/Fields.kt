@@ -25,9 +25,9 @@ data class Fields(
     val ids: List<AutofillId> get() = listOfNotNull(username, password)
 
     /**
-     * The site, believed only from a browser. Any app can show a real bank's page in a web view
-     * of its own and read back what is filled into it, so a page inside an ordinary app is
-     * treated as that app: matched by a claim on the app, or chosen by hand.
+     * The site, believed only from a known browser ([Browsers]). Any app can show a real bank's
+     * page in a web view of its own and read back what is filled into it, so a page inside any
+     * other app is treated as that app: matched by a claim on the app, or chosen by hand.
      */
     fun site(context: android.content.Context): String? =
         (webDomain ?: pageDomain)?.takeIf { Browsers.isBrowser(context, packageName) }
@@ -128,16 +128,5 @@ data class Fields(
             val words = listOfNotNull(node.idEntry, node.hint, node.contentDescription?.toString()).joinToString(" ").lowercase()
             return listOf("user", "email", "e-mail", "login", "account", "mail").any { it in words }
         }
-    }
-}
-
-/** Which installed apps are browsers: the ones that answer a plain web address. */
-object Browsers {
-    fun isBrowser(context: android.content.Context, packageName: String): Boolean {
-        val probe = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://example.com/"))
-            .addCategory(android.content.Intent.CATEGORY_BROWSABLE)
-        @Suppress("DEPRECATION") // the flags-object overload is Android 13; the Kompakt is 12
-        return context.packageManager.queryIntentActivities(probe, android.content.pm.PackageManager.MATCH_ALL)
-            .any { it.activityInfo.packageName == packageName }
     }
 }
