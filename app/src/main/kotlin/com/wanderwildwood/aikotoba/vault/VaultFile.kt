@@ -66,8 +66,13 @@ class VaultFile(private val context: Context, val uri: Uri) {
             PackageManager.PERMISSION_GRANTED
     }
 
-    /** Replace the file with [bytes], if it still is the file whose hash is [expected] (null: replace whatever is there). */
-    fun write(bytes: ByteArray, expected: ByteArray?): Saved {
+    /**
+     * Replace the file with [bytes], if it still is the file whose hash is [expected] (null: replace
+     * whatever is there). [putBack]: [bytes] are the copy kept from before, being put back; if that
+     * does not go through, the copy is kept again, since it was replaced by the file now there
+     * before the write began.
+     */
+    fun write(bytes: ByteArray, expected: ByteArray?, putBack: Boolean = false): Saved {
         val current = try {
             read()
         } catch (e: Exception) {
@@ -105,6 +110,7 @@ class VaultFile(private val context: Context, val uri: Uri) {
                 // The server's file was saved by someone else while this went up, and Files
                 // refused to replace it: nothing was written, and there is nothing to put back.
                 Pending.end(context)
+                if (putBack && !suspect) keepAgain(bytes)
                 return Saved.Changed
             }
             e.message ?: e.javaClass.simpleName
@@ -120,7 +126,13 @@ class VaultFile(private val context: Context, val uri: Uri) {
         // Put back and checked: nothing is left half done. Not put back: the note stays, and the
         // next open offers the copy from before.
         if (restored && !suspect) Pending.end(context)
+        if (putBack && !suspect) keepAgain(bytes)
         return Saved.Failed(problem, restored)
+    }
+
+    /** The copy from before, kept again after a put-back of it did not go through: it is still the way back. */
+    private fun keepAgain(bytes: ByteArray) {
+        runCatching { keepPrevious(bytes) }
     }
 
     private fun writeWhole(bytes: ByteArray) {

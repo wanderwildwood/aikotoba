@@ -218,6 +218,20 @@ object Session {
         }
     }
 
+    /**
+     * The copy kept from before the last save, written back over the open vault's file. In turn
+     * with the saves, never alongside one; once it is back the vault locks, because what is in
+     * memory is no longer what the file holds, and a save waiting behind this one finds it locked
+     * rather than writing over the copy just put back.
+     */
+    fun putBack(context: Context): Boolean = synchronized(writing) {
+        val current = _state.value ?: return@synchronized false
+        val previous = VaultFile.previous(context, current.uri) ?: return@synchronized false
+        val done = VaultFile(context, current.uri).write(previous, expected = null, putBack = true) is VaultFile.Saved.Done
+        if (done) lock()
+        done
+    }
+
     /** Throw away what is in memory and read the file again, with the same password. */
     fun reload(context: Context): Opened = synchronized(writing) { reloadNow(context) }
 

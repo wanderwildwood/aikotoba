@@ -481,15 +481,11 @@ class Actions(
 
     /** The copy kept from before the last save, written back over the vault file. */
     fun putBackPrevious() {
-        val open = Session.open ?: return
+        if (Session.open == null) return
         scope.launch {
-            val ok = withContext(Dispatchers.IO) {
-                val previous = VaultFile.previous(context, open.uri) ?: return@withContext false
-                val r = VaultFile(context, open.uri).write(previous, expected = null)
-                r is VaultFile.Saved.Done
-            }
+            // Session locks the vault itself once the copy is back.
+            val ok = withContext(Dispatchers.IO) { Session.putBack(context) }
             if (ok) {
-                Session.lock()
                 Notice.say(context.getString(R.string.previous_put_back))
             } else {
                 Notice.say(context.getString(R.string.previous_failed))
