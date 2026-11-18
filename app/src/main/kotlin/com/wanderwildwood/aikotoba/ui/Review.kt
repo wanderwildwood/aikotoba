@@ -28,6 +28,7 @@ import com.wanderwildwood.aikotoba.R
 import com.wanderwildwood.aikotoba.importer.Found
 import com.wanderwildwood.aikotoba.importer.Import
 import com.wanderwildwood.aikotoba.otp.OtpSpec
+import com.wanderwildwood.aikotoba.vault.NativeKdf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -86,6 +87,10 @@ fun ReviewScreen(found: Found, existing: List<OtpSpec>, onBack: () -> Unit, onAd
     }
 }
 
+/** What to say when a kAuth backup did not open for a reason other than the password. */
+internal fun kauthFailure(e: Exception): Int =
+    if (e is NativeKdf.TooCostly) R.string.kauth_too_costly else R.string.kauth_unreadable
+
 /** kAuth's encrypted backup: its own master password opens it, here and nowhere else. */
 @Composable
 fun KauthScreen(blob: String, onBack: () -> Unit, onOpened: (Found) -> Unit) {
@@ -109,7 +114,7 @@ fun KauthScreen(blob: String, onBack: () -> Unit, onOpened: (Found) -> Unit) {
                 } catch (e: WrongPasswordException) {
                     null
                 } catch (e: Exception) {
-                    Found(failures = listOf(e.message ?: e.javaClass.simpleName))
+                    Found(failures = listOf(context.getString(kauthFailure(e))))
                 } finally {
                     chars.fill(' ')
                 }

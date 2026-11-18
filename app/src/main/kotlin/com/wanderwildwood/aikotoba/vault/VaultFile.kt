@@ -41,13 +41,13 @@ class VaultFile(private val context: Context, val uri: Uri) {
 
     /** The whole file, up to [MAX_BYTES]: anything bigger is not a vault, and would not fit in memory. */
     fun read(): ByteArray {
-        val input = context.contentResolver.openInputStream(uri) ?: throw IOException("nothing answered for the file")
+        val input = context.contentResolver.openInputStream(uri) ?: throw IOException(context.getString(R.string.vault_no_answer))
         val bytes = try {
             input.use { readAtMost(it, MAX_BYTES + 1) }
         } catch (e: OutOfMemoryError) {
-            throw IOException("the file is too large to open")
+            throw IOException(context.getString(R.string.vault_too_large))
         }
-        if (bytes.size > MAX_BYTES) throw IOException("the file is too large to be a vault")
+        if (bytes.size > MAX_BYTES) throw IOException(context.getString(R.string.vault_too_large))
         return bytes
     }
 
@@ -97,14 +97,14 @@ class VaultFile(private val context: Context, val uri: Uri) {
         } catch (e: Exception) {
             // Without the copy from before, the save does not go ahead: a failure halfway would
             // then have nothing to put back.
-            return Saved.Failed("could not keep the copy from before: ${e.message}", restored = true)
+            return Saved.Failed(context.getString(R.string.save_keep_failed), restored = true)
         }
 
         val newHash = sha256(bytes)
         Pending.begin(context, uri, newHash)
         val problem = try {
             writeWhole(bytes)
-            if (sha256(read()).contentEquals(newHash)) null else "it read back different"
+            if (sha256(read()).contentEquals(newHash)) null else context.getString(R.string.save_read_back_different)
         } catch (e: Exception) {
             if (refusedAsChanged(e)) {
                 // The server's file was saved by someone else while this went up, and Files
@@ -139,7 +139,7 @@ class VaultFile(private val context: Context, val uri: Uri) {
         // "rwt" truncates; some providers only know "wt".
         val pfd = runCatching { context.contentResolver.openFileDescriptor(uri, "rwt") }.getOrNull()
             ?: context.contentResolver.openFileDescriptor(uri, "wt")
-            ?: throw IOException("nothing answered for the file")
+            ?: throw IOException(context.getString(R.string.vault_no_answer))
         pfd.use {
             FileOutputStream(it.fileDescriptor).use { out ->
                 out.write(bytes)
