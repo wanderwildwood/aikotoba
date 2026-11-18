@@ -8,11 +8,19 @@ import android.net.Uri
  * No password, no key, nothing from inside the vault.
  */
 class Prefs(context: Context) {
-    private val p = context.applicationContext.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+    private val app = context.applicationContext
+    private val p = app.getSharedPreferences("prefs", Context.MODE_PRIVATE)
 
+    /**
+     * The remembered vault. Choosing a different one forgets the fingerprint key, which was made
+     * for the old file's password: fingerprint unlock is then set up again for the new vault.
+     */
     var vault: Uri?
         get() = p.getString("vault", null)?.let(Uri::parse)
-        set(value) { p.edit().putString("vault", value?.toString()).apply() }
+        set(value) {
+            if (value != vault) com.wanderwildwood.aikotoba.vault.Fingerprint.forget(app)
+            p.edit().putString("vault", value?.toString()).apply()
+        }
 
     /** Minutes away from the app before it locks itself; 0 locks on leaving. */
     var lockMinutes: Int

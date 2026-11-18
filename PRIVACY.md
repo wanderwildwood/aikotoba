@@ -30,10 +30,13 @@ What is kept inside the app:
   the password generator's choices. No password, key or entry.
 - **The vault file as it was before the last save**, which is as encrypted as the file itself, so
   a save that goes wrong can be undone. It is deleted when the vault is closed in Settings.
+  Choosing a different vault keeps it (it is still the old vault's way back) until a vault is
+  next saved, which replaces it with the copy from before that save.
 - **With fingerprint unlock on, the master password encrypted** (AES-GCM) by a key that lives in
   the phone's hardware key store and never leaves it. That key can only be used right after a
   registered fingerprint is read, and the phone destroys it if a fingerprint is added or removed.
-  Turning the setting off, or closing the vault, deletes both the key and the ciphertext. Nothing
+  Turning the setting off, closing the vault, or choosing a different vault deletes both the key
+  and the ciphertext. Nothing
   that could open the vault is ever written in the clear.
 
 Both are left out of Android's backups and device-to-device transfers (`allowBackup="false"`, and
