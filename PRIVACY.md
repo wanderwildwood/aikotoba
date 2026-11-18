@@ -54,7 +54,7 @@ data-extraction rules that exclude everything).
 - **Autofill.** When you choose Passwords as the phone's autofill service, other apps ask it for
   sign-ins. It answers only with entries that name that app or that web site, or with the entry
   you pick yourself, and never keeps what you type in those apps. A web site is believed only from
-  a known browser (Chrome, Firefox, Brave, DuckDuckGo, Vivaldi, Edge, Samsung Internet), checked
+  a known browser (Chrome, Firefox, EinkBro, Brave, DuckDuckGo, Vivaldi, Edge, Samsung Internet), checked
   by the certificate it is signed with; any other app is matched only as itself.
 - **Shared to it.** Links and pictures shared to Passwords are read for two-step codes and not
   kept.

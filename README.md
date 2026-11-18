@@ -48,7 +48,7 @@ the backup.
   browser whose address is theirs, and to an app that the entry names; anything else is a search away,
   and a sign-in picked by hand can be remembered for that app. A web page shown inside some other
   app counts as that app, since the app can read what is filled into it, and a pick made on such a
-  page is not remembered for the app. The known browsers are Chrome, Firefox, Brave, DuckDuckGo,
+  page is not remembered for the app. The known browsers are Chrome, Firefox, EinkBro, Brave, DuckDuckGo,
   Vivaldi, Edge and Samsung Internet, each checked by the certificate it is signed with; any other
   app that opens web pages counts as an app, so its pages are a search away. While the vault is
   locked the offer is a single line that unlocks it.
