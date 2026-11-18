@@ -45,5 +45,9 @@ class MatchTest {
         assertFalse(Match.mayRemember(site = "example.org", webDomain = "example.org"))
         // A web page inside some other app.
         assertFalse(Match.mayRemember(site = null, webDomain = "bank.example.org"))
+        // A browser not on the known list that names its page only away from the fields.
+        assertFalse(Match.mayRemember(site = null, webDomain = null, pageDomain = "bank.example.org"))
+        assertFalse(Match.mayRemember(site = null, webDomain = "", pageDomain = "bank.example.org"))
+        assertTrue(Match.mayRemember(site = null, webDomain = null, pageDomain = ""))
     }
 }

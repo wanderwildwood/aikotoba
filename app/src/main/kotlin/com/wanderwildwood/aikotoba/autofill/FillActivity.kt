@@ -102,7 +102,7 @@ class FillActivity : ComponentActivity() {
         val dataset = FillService.dataset(this, item, Vault.password(open.db, item.uuid), fields)
         setResult(RESULT_OK, Intent().putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, dataset))
         // An app (not a web page) the entry did not name yet: name it, so it is offered there next time.
-        if (prefs.rememberForApp && Match.mayRemember(site, fields.webDomain) && !Match.matches(item, fields.packageName, null) && open.writable) {
+        if (prefs.rememberForApp && Match.mayRemember(site, fields.webDomain, fields.pageDomain) && !Match.matches(item, fields.packageName, null) && open.writable) {
             val context = applicationContext
             val claim = Match.claim(fields.packageName)
             background.launch {
@@ -141,7 +141,7 @@ private fun Pick(open: Session.Open, fields: Fields, site: String?, asking: Stri
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         )
         PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
-            if (Match.mayRemember(site, fields.webDomain)) {
+            if (Match.mayRemember(site, fields.webDomain, fields.pageDomain)) {
                 item {
                     PlainRow(
                         title = stringResource(R.string.fill_remember, asking),

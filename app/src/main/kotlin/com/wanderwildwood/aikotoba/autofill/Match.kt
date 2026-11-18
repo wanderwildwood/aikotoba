@@ -49,10 +49,13 @@ object Match {
     /**
      * Whether a sign-in picked by hand may be remembered for the asking app. Only for an app's
      * own screen: a browser's page is matched by its address, and a web page shown inside some
-     * other app ([webDomain] set, but no [site] believed) is not that app's own sign-in, so a
-     * pick made there is not written into the entry as a claim for the app.
+     * other app (a [webDomain] or [pageDomain] anywhere, but no [site] believed) is not that
+     * app's own sign-in, so a pick made there is not written into the entry as a claim for the
+     * app. A browser not on the known list shows its page's address only as [pageDomain] at
+     * times; remembering there would offer the entry on every site in that browser.
      */
-    fun mayRemember(site: String?, webDomain: String?): Boolean = site == null && webDomain.isNullOrBlank()
+    fun mayRemember(site: String?, webDomain: String?, pageDomain: String? = null): Boolean =
+        site == null && webDomain.isNullOrBlank() && pageDomain.isNullOrBlank()
 
     /** The address to add to an entry so the app named by [packageName] finds it next time. */
     fun claim(packageName: String) = APP_SCHEME + packageName
