@@ -225,10 +225,6 @@ class VaultFile(private val context: Context, val uri: Uri) {
         }
 
         /**
-         * Whether the last save of [uri] began and was never seen to finish, and the file is not
-         * what it was going to be. A save that did finish clears the note here.
-         */
-        /**
          * Whether the note is for another file than [uri], that file's save is still not seen to
          * have finished, and the copy from before kept for it is still here. The other file is
          * read to see: a save that did finish clears the note. A note with no copy left (the
@@ -246,6 +242,10 @@ class VaultFile(private val context: Context, val uri: Uri) {
             return interrupted(context, otherUri, bytes)
         }
 
+        /**
+         * Whether the last save of [uri] began and was never seen to finish, and the file is not
+         * what it was going to be. A save that did finish clears the note here.
+         */
         fun interrupted(context: Context, uri: Uri, current: ByteArray?): Boolean {
             val p = prefs(context)
             if (p.getString("uri", null) != uri.toString()) return false
