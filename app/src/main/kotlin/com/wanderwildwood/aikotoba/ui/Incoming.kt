@@ -55,11 +55,8 @@ object Incoming {
                 // file:// path is not opened.
                 What.Nothing
             } else {
-                if ((intent.flags and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0) runCatching {
-                    val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
-                        (intent.flags and Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                    context.contentResolver.takePersistableUriPermission(uri, flags)
-                }
+                // The grant that came with the intent, and no lasting one: the file is opened for
+                // now only, and the right to it ends with this visit.
                 What.VaultFile(uri)
             }
         }
