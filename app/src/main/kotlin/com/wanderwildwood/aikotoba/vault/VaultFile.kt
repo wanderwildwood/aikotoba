@@ -31,7 +31,10 @@ class VaultFile(private val context: Context, val uri: Uri) {
         data class Done(val hash: ByteArray) : Saved()
         /** The file is not what was opened: someone else saved it. Nothing was written. */
         object Changed : Saved()
-        /** It could not be written, or did not read back right; [restored] says whether the old file was put back. */
+        /**
+         * It could not be written, or did not read back right; [restored] says whether the file
+         * is as it was (also when nothing was written at all).
+         */
         data class Failed(val reason: String, val restored: Boolean) : Saved()
     }
 
@@ -59,7 +62,9 @@ class VaultFile(private val context: Context, val uri: Uri) {
         val current = try {
             read()
         } catch (e: Exception) {
-            return Saved.Failed(e.message ?: e.javaClass.simpleName, restored = false)
+            // Nothing written: the file is as it was, and the copy from before must not be
+            // offered as the way back, since it is older than the file.
+            return Saved.Failed(e.message ?: e.javaClass.simpleName, restored = true)
         }
         if (expected != null && !sha256(current).contentEquals(expected)) return Saved.Changed
 
@@ -72,7 +77,7 @@ class VaultFile(private val context: Context, val uri: Uri) {
         } catch (e: Exception) {
             // Without the copy from before, the save does not go ahead: a failure halfway would
             // then have nothing to put back.
-            return Saved.Failed("could not keep the copy from before: ${e.message}", restored = false)
+            return Saved.Failed("could not keep the copy from before: ${e.message}", restored = true)
         }
 
         val newHash = sha256(bytes)
