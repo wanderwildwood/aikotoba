@@ -12,8 +12,11 @@ import kotlinx.coroutines.withContext
 object Incoming {
 
     sealed class What {
-        /** [remembered]: the app may open it again after a restart; otherwise it is for now only. */
-        data class VaultFile(val uri: Uri, val remembered: Boolean) : What()
+        /**
+         * A vault file opened from another app. It is opened for now only and never becomes the
+         * remembered vault this way: that takes Open a different vault, the app's own choice.
+         */
+        data class VaultFile(val uri: Uri) : What()
         data class Codes(val recognised: Recognised) : What()
         object Nothing : What()
     }
@@ -31,6 +34,15 @@ object Incoming {
         return out.toByteArray()
     }
 
+    /** Whether [scheme] is a content address's, the only kind of vault file taken from another app. */
+    fun isContent(scheme: String?): Boolean = scheme.equals("content", ignoreCase = true)
+
+    /**
+     * Whether a vault file handed over by another app needs a yes before it is opened: when a
+     * different vault is open or waiting to be unlocked. [current] is that vault, if any.
+     */
+    fun <T> asksFirst(current: T?, handed: T): Boolean = current != null && current != handed
+
     /** Files and pictures are read off the main thread; called from a coroutine. */
     suspend fun read(context: Context, intent: Intent): What = when (intent.action) {
         Intent.ACTION_VIEW -> {
@@ -38,13 +50,17 @@ object Incoming {
             if (uri == null) What.Nothing
             else if (uri.scheme.equals("otpauth", true) || uri.scheme.equals("otpauth-migration", true)) {
                 What.Codes(Import.recognise(uri.toString()))
+            } else if (!isContent(uri.scheme)) {
+                // Only a file handed over through a content address with its own grant; a bare
+                // file:// path is not opened.
+                What.Nothing
             } else {
-                val kept = (intent.flags and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0 && runCatching {
+                if ((intent.flags and Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0) runCatching {
                     val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or
                         (intent.flags and Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
                     context.contentResolver.takePersistableUriPermission(uri, flags)
-                }.isSuccess
-                What.VaultFile(uri, kept)
+                }
+                What.VaultFile(uri)
             }
         }
         Intent.ACTION_SEND -> {

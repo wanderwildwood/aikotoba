@@ -4,6 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -14,8 +18,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import app.keemobile.kotpass.database.KeePassDatabase
 import com.wanderwildwood.aikotoba.Prefs
 import com.wanderwildwood.aikotoba.R
@@ -75,6 +81,8 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
     var about by remember { mutableStateOf(false) }
     var conflict by remember { mutableStateOf(false) }
     var generating by remember { mutableStateOf(false) }
+    // A vault file another app handed over while a different vault is here: asked about first.
+    var handed by remember { mutableStateOf<Uri?>(null) }
 
     LaunchedEffect(open == null) {
         generating = false
@@ -90,10 +98,14 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
         onIncomingTaken()
         when (val what = Incoming.read(context, intent)) {
             is Incoming.What.VaultFile -> {
-                if (open?.uri != what.uri) Session.lock()
-                target = what.uri
-                visiting = !what.remembered
-                if (what.remembered) prefs.vault = what.uri
+                // Another app's file is opened for now only, and never in place of the vault
+                // already here without a yes.
+                if (Incoming.asksFirst(open?.uri ?: target, what.uri)) {
+                    handed = what.uri
+                } else if (open?.uri != what.uri) {
+                    target = what.uri
+                    visiting = what.uri != prefs.vault
+                }
             }
             is Incoming.What.Codes -> when (val r = what.recognised) {
                 is Recognised.Codes -> if (open != null) stack.add(Route.Review(r.found)) else waiting = r.found
@@ -330,6 +342,37 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
         }
     }
     if (about) AboutDialog(onDismiss = { about = false })
+    handed?.let { uri ->
+        HandedDialog(
+            uri = uri,
+            onOpen = {
+                handed = null
+                Session.lock()
+                target = uri
+                visiting = uri != prefs.vault
+            },
+            onDismiss = { handed = null },
+        )
+    }
+}
+
+/**
+ * Another app handed over a vault file while a different vault is open or waiting to be
+ * unlocked. Nothing changes until the person says so; a yes locks the vault here and opens the
+ * other file for now, and the remembered vault stays as it is.
+ */
+@Composable
+private fun HandedDialog(uri: Uri, onOpen: () -> Unit, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val name = remember(uri) { VaultFile(context, uri).name() }
+    EInkDialog(onDismiss = onDismiss) {
+        Column {
+            Say(stringResource(R.string.handed_what, name), Modifier.padding(bottom = 8.dp))
+            FootButton(stringResource(R.string.handed_open), onClick = onOpen)
+            Spacer(Modifier.height(10.dp))
+            FootButton(stringResource(R.string.handed_keep), onClick = onDismiss)
+        }
+    }
 }
 
 /** The work behind the screens that touches the file: off the main thread, said out loud when it fails. */

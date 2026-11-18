@@ -37,6 +37,9 @@
     <string name="unlock_unreadable">The file could not be read: %1$s. If it was moved or its app removed, choose it again.</string>
     <string name="unlock_visiting">Opened from another app, for now. Choose it with Open a different vault to have it remembered.</string>
     <string name="unlock_other">Open a different vault</string>
+    <string name="handed_what">Another app handed over the vault file %1$s. Open it in place of the vault here? That vault is locked first and stays the one Passwords remembers; this file is opened for now only.</string>
+    <string name="handed_open">Open it</string>
+    <string name="handed_keep">Keep the vault here</string>
     <string name="key_file_add">Needs a key file too? Choose it</string>
     <string name="key_file_is">Key file: %1$s (press to remove)</string>
     <string name="key_file_unreadable">That key file could not be read.</string>
