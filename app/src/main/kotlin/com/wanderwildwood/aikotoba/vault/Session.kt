@@ -231,6 +231,8 @@ object Session {
             if (_state.compareAndSet(current, reloaded)) Opened.Done else Opened.Locked
         } catch (e: CryptoError.InvalidKey) {
             Opened.WrongPassword
+        } catch (e: OutOfMemoryError) {
+            Opened.Unreadable("the file asks for more memory than the phone can give")
         } catch (e: Exception) {
             Opened.Unreadable(e.message ?: e.javaClass.simpleName)
         }

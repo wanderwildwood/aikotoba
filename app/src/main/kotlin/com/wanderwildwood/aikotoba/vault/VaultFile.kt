@@ -39,9 +39,17 @@ class VaultFile(private val context: Context, val uri: Uri) {
         data class Failed(val reason: String, val restored: Boolean) : Saved()
     }
 
-    fun read(): ByteArray =
-        context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-            ?: throw IOException("nothing answered for the file")
+    /** The whole file, up to [MAX_BYTES]: anything bigger is not a vault, and would not fit in memory. */
+    fun read(): ByteArray {
+        val input = context.contentResolver.openInputStream(uri) ?: throw IOException("nothing answered for the file")
+        val bytes = try {
+            input.use { readAtMost(it, MAX_BYTES + 1) }
+        } catch (e: OutOfMemoryError) {
+            throw IOException("the file is too large to open")
+        }
+        if (bytes.size > MAX_BYTES) throw IOException("the file is too large to be a vault")
+        return bytes
+    }
 
     /** What the file is called where it lives, for the screens. */
     fun name(): String = runCatching {
@@ -156,6 +164,21 @@ class VaultFile(private val context: Context, val uri: Uri) {
 
         private const val PREVIOUS = "previous.kdbx"
         private const val PREVIOUS_FROM = "previous.from"
+
+        /** Far beyond any real KeePass file, attachments and all. */
+        const val MAX_BYTES = 128 * 1024 * 1024
+
+        /** At most [limit] bytes of [input]; a longer stream is cut there. */
+        fun readAtMost(input: java.io.InputStream, limit: Int): ByteArray {
+            val out = java.io.ByteArrayOutputStream()
+            val buf = ByteArray(64 * 1024)
+            while (out.size() < limit) {
+                val n = input.read(buf, 0, minOf(buf.size, limit - out.size()))
+                if (n < 0) break
+                out.write(buf, 0, n)
+            }
+            return out.toByteArray()
+        }
 
         fun sha256(bytes: ByteArray): ByteArray = MessageDigest.getInstance("SHA-256").digest(bytes)
 
