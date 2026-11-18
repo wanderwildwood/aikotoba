@@ -107,6 +107,8 @@ fun UnlockScreen(
                 password = ""
                 onUnlocked()
             }
+            // The screen went dark while it opened: it stays locked, and the password typed goes.
+            Session.Opened.Locked -> password = ""
             Session.Opened.WrongPassword -> if (byFingerprint) {
                 // The file's password was changed elsewhere (a computer): what was kept no longer opens it.
                 Fingerprint.forget(context)

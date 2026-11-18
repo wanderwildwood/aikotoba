@@ -54,14 +54,34 @@ object Session {
     val state: StateFlow<Open?> = _state
     val open: Open? get() = _state.value
 
+    /**
+     * Counts the locks. An unlock takes seconds (the key derivation), and the screen can go dark
+     * meanwhile: what it opened is shown only if no lock came in between, or a vault locked by the
+     * screen would open again behind it.
+     */
+    private var locks = 0L
+    private val gate = Any()
+
+    private fun locksNow(): Long = synchronized(gate) { locks }
+
+    /** [open] made the open vault, unless a lock came after [since]. */
+    private fun publish(since: Long, open: Open): Boolean = synchronized(gate) {
+        if (locks != since) return false
+        _state.value = open
+        true
+    }
+
     sealed class Opened {
         object Done : Opened()
+        /** It opened, but the vault was locked while it did (the screen went dark): it stays locked. */
+        object Locked : Opened()
         object WrongPassword : Opened()
         data class NotKeePass(val reason: String) : Opened()
         data class Unreadable(val reason: String) : Opened()
     }
 
     fun unlock(context: Context, uri: Uri, password: String, keyFile: ByteArray?): Opened {
+        val since = locksNow()
         val file = VaultFile(context, uri)
         val bytes = try {
             file.read()
@@ -80,8 +100,8 @@ object Session {
             if (com.wanderwildwood.aikotoba.BuildConfig.DEBUG) {
                 android.util.Log.i("aikotoba", "opened in ${android.os.SystemClock.elapsedRealtime() - started} ms")
             }
-            _state.value = Open(uri, file.name(), db, VaultFile.sha256(bytes), file.writable(), keyFile = keyFile, passphrase = EncryptedValue.fromString(password))
-            Opened.Done
+            val unlocked = Open(uri, file.name(), db, VaultFile.sha256(bytes), file.writable(), keyFile = keyFile, passphrase = EncryptedValue.fromString(password))
+            if (publish(since, unlocked)) Opened.Done else Opened.Locked
         } catch (e: CryptoError.InvalidKey) {
             Opened.WrongPassword
         } catch (e: CryptoError.InvalidCipherText) {
@@ -99,6 +119,7 @@ object Session {
 
     /** A new, empty vault written to [uri] (a file just made by the system's "save as"). */
     fun create(context: Context, uri: Uri, password: String, title: String): Opened {
+        val since = locksNow()
         val meta = Meta(generator = GENERATOR, name = title, recycleBinEnabled = true)
         val fresh = KeePassDatabase.Ver4x.create(title, meta, credentials(password, null))
         // Argon2id rather than kotpass's Argon2d default: the same memory and passes, without
@@ -112,7 +133,8 @@ object Session {
         val file = VaultFile(context, uri)
         return when (val r = file.write(bytes, expected = null)) {
             is VaultFile.Saved.Done -> {
-                _state.value = Open(uri, file.name(), db, r.hash, file.writable(), passphrase = EncryptedValue.fromString(password))
+                // Made either way; locked meanwhile, it waits for the unlock like any vault.
+                publish(since, Open(uri, file.name(), db, r.hash, file.writable(), passphrase = EncryptedValue.fromString(password)))
                 Opened.Done
             }
             is VaultFile.Saved.Failed -> Opened.Unreadable(r.reason)
@@ -121,7 +143,10 @@ object Session {
     }
 
     fun lock() {
-        _state.value = null
+        synchronized(gate) {
+            locks++
+            _state.value = null
+        }
     }
 
     sealed class Saved {
@@ -149,7 +174,8 @@ object Session {
         val current = _state.value ?: return Saved.Failed("the vault is locked", restored = true)
         val db = change(current.db)
         val pending = Open(current.uri, current.name, db, current.hash, current.writable, unsaved = true, keyFile = current.keyFile, passphrase = current.passphrase)
-        _state.value = pending
+        // Not over a lock that came after [current] was read.
+        if (!_state.compareAndSet(current, pending)) return Saved.Failed("the vault is locked", restored = true)
         if (!current.writable) return Saved.ReadOnly
         val bytes = try {
             encode(db)
@@ -159,9 +185,7 @@ object Session {
         return when (val r = VaultFile(context, current.uri).write(bytes, if (force) null else current.hash)) {
             is VaultFile.Saved.Done -> {
                 // Only if nothing else replaced the state meanwhile (a lock, another vault).
-                if (_state.value === pending) {
-                    _state.value = Open(current.uri, current.name, db, r.hash, current.writable, unsaved = false, keyFile = current.keyFile, passphrase = current.passphrase)
-                }
+                _state.compareAndSet(pending, Open(current.uri, current.name, db, r.hash, current.writable, unsaved = false, keyFile = current.keyFile, passphrase = current.passphrase))
                 Saved.Done
             }
             VaultFile.Saved.Changed -> Saved.Changed
@@ -185,7 +209,8 @@ object Session {
         val file = VaultFile(context, uri)
         return when (val r = file.write(bytes, expected = null)) {
             is VaultFile.Saved.Done -> {
-                _state.value = Open(uri, file.name(), current.db, r.hash, file.writable(), keyFile = current.keyFile, passphrase = current.passphrase)
+                // Written either way; locked meanwhile, the new file is unlocked like any vault.
+                _state.compareAndSet(current, Open(uri, file.name(), current.db, r.hash, file.writable(), keyFile = current.keyFile, passphrase = current.passphrase))
                 Saved.Done
             }
             VaultFile.Saved.Changed -> Saved.Changed
@@ -202,8 +227,8 @@ object Session {
         return try {
             val bytes = file.read()
             val db = decode(bytes, current.db.credentials)
-            _state.value = Open(current.uri, current.name, db, VaultFile.sha256(bytes), current.writable, keyFile = current.keyFile, passphrase = current.passphrase)
-            Opened.Done
+            val reloaded = Open(current.uri, current.name, db, VaultFile.sha256(bytes), current.writable, keyFile = current.keyFile, passphrase = current.passphrase)
+            if (_state.compareAndSet(current, reloaded)) Opened.Done else Opened.Locked
         } catch (e: CryptoError.InvalidKey) {
             Opened.WrongPassword
         } catch (e: Exception) {
@@ -238,15 +263,16 @@ object Session {
                 is KeePassDatabase.Ver4x -> db.copy(credentials = credentials)
             }.modifyMeta { copy(masterKeyChanged = Instant.now()) }
         }
+        val now = _state.value
         if (r == Saved.Done) {
-            _state.value?.let { c ->
-                _state.value = Open(c.uri, c.name, c.db, c.hash, c.writable, c.unsaved, c.keyFile, EncryptedValue.fromString(password))
+            now?.let { c ->
+                _state.compareAndSet(c, Open(c.uri, c.name, c.db, c.hash, c.writable, c.unsaved, c.keyFile, EncryptedValue.fromString(password)))
             }
-        } else if (before != null && _state.value?.uri == before.uri) {
+        } else if (before != null && now != null && now.uri == before.uri) {
             // All or nothing: a password not written to the file is not kept in memory either,
             // or a later save of anything else would change it unasked, and Reload could not open
             // the file with it.
-            _state.value = before
+            _state.compareAndSet(now, before)
         }
         return r
     }

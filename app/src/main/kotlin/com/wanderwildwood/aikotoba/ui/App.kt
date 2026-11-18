@@ -417,7 +417,7 @@ class Actions(
     fun reload() {
         scope.launch {
             val r = withContext(Dispatchers.IO) { Session.reload(context) }
-            if (r != Session.Opened.Done) Notice.say(context.getString(R.string.reload_failed))
+            if (r != Session.Opened.Done && r != Session.Opened.Locked) Notice.say(context.getString(R.string.reload_failed))
         }
     }
 
