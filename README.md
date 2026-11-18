@@ -52,6 +52,8 @@ the backup.
   a single line that unlocks it.
 - **Locks itself** when the screen goes dark, and after a few minutes away from the app (on
   leaving, 1, 5 or 15 minutes). No screenshots, nothing in the Recents picture.
+- **Dark mode**, a switch in Settings; the app also follows the phone's own dark setting. The
+  QR scanner's camera picture keeps its colors.
 - **Opens with a fingerprint**, if you ask it to in Settings. The master password is then kept
   encrypted by a key in the phone's secure key store that only a registered finger can use, the
   way KeePassDX does it; a fingerprint added or removed on the phone destroys that key, and the
