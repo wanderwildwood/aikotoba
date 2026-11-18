@@ -29,7 +29,9 @@ What is kept inside the app:
 - **Its settings**: which file is the vault, how long until it locks, which list opens first, and
   the password generator's choices. No password, key or entry.
 - **The vault file as it was before the last save**, which is as encrypted as the file itself, so
-  a save that goes wrong can be undone. It is deleted when the vault is closed in Settings.
+  a save that goes wrong can be undone. It is deleted when its vault is closed in Settings.
+  Closing a file opened for now from another app only locks it and goes back to the remembered
+  vault, keeping that vault's copy and fingerprint key.
   Choosing a different vault keeps it (it is still the old vault's way back) until a vault is
   next saved, which replaces it with the copy from before that save. After a save that was cut
   short, the copy is that vault's way back, and no other vault is saved until it is put back or
@@ -84,5 +86,5 @@ If you are in the EU, the EEA or the UK, the GDPR gives you the right to:
 
 Similar laws elsewhere, such as the CCPA in California, give you the right to know, delete and correct, and to opt out of the sale or sharing of your data. Nothing from Passwords is sold or shared.
 
-Since Passwords keeps what it stores only on your phone, you can exercise most of these rights yourself: edit or delete any entry in the app, close the vault in Settings (which also deletes the copy kept from before the last save and any fingerprint key), clear the app's data in Android's settings, or uninstall the app, which deletes all of it. For anything you cannot do yourself, write to the address above.
+Since Passwords keeps what it stores only on your phone, you can exercise most of these rights yourself: edit or delete any entry in the app, close the vault in Settings (which also deletes the copy kept from before the last save and any fingerprint key; closing a file opened for now from another app only locks it and goes back to the remembered vault, keeping that vault's copy and fingerprint key), clear the app's data in Android's settings, or uninstall the app, which deletes all of it. For anything you cannot do yourself, write to the address above.
 <!-- /shared-about privacy section -->
