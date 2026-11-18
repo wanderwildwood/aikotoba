@@ -204,9 +204,19 @@ class VaultFile(private val context: Context, val uri: Uri) {
             return if (from == uri.toString() && file.isFile) file.readBytes() else null
         }
 
-        /** Forget the copy from before, when the vault it belonged to is closed. */
-        fun forgetPrevious(context: Context) {
-            previousDir(context).deleteRecursively()
+        /**
+         * Forget the copy from before, when the vault it belongs to, [uri], is closed. A copy kept
+         * for another vault stays: after a save of that vault was cut short, it is its only good
+         * copy.
+         */
+        fun forgetPrevious(context: Context, uri: Uri) {
+            forgetPreviousIn(previousDir(context), uri.toString())
+        }
+
+        /** [forgetPrevious] on the folder [dir], for the vault at [uri]. */
+        internal fun forgetPreviousIn(dir: File, uri: String) {
+            val from = runCatching { File(dir, PREVIOUS_FROM).readText() }.getOrNull()
+            if (from == uri) dir.deleteRecursively()
         }
     }
 

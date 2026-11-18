@@ -313,7 +313,7 @@ fun App(incoming: Intent?, onIncomingTaken: () -> Unit) {
                             target = prefs.vault
                             visiting = false
                         } else {
-                            VaultFile.forgetPrevious(context)
+                            VaultFile.forgetPrevious(context, vault.uri)
                             Fingerprint.forget(context)
                             prefs.vault = null
                             target = null
