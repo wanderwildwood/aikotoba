@@ -13,7 +13,14 @@ data class Fields(
     val username: AutofillId?,
     val password: AutofillId?,
     val packageName: String,
+    /** The site the sign-in fields themselves sit in: the nearest web domain above them. */
     val webDomain: String?,
+    /**
+     * The first web domain anywhere on the screen, for a browser that names its page somewhere
+     * other than above the fields. Not the fields' own: a web view elsewhere in an app (a help
+     * page, an advert) does not make the app's own sign-in a web page.
+     */
+    val pageDomain: String? = null,
 ) {
     val ids: List<AutofillId> get() = listOfNotNull(username, password)
 
@@ -23,7 +30,7 @@ data class Fields(
      * treated as that app: matched by a claim on the app, or chosen by hand.
      */
     fun site(context: android.content.Context): String? =
-        webDomain?.takeIf { Browsers.isBrowser(context, packageName) }
+        (webDomain ?: pageDomain)?.takeIf { Browsers.isBrowser(context, packageName) }
     val fillable: Boolean get() = password != null || username != null
 
     companion object {
@@ -76,7 +83,7 @@ data class Fields(
             // A user name box from another site than the password box is not filled with it.
             if (user != null && pass != null && siteOf[user] != null && siteOf[pass] != null && siteOf[user] != siteOf[pass]) user = null
             val fieldSite = (pass ?: user)?.let { siteOf[it] }
-            return Fields(user?.autofillId, pass?.autofillId, structure.activityComponent.packageName, fieldSite ?: domain)
+            return Fields(user?.autofillId, pass?.autofillId, structure.activityComponent.packageName, fieldSite, domain)
         }
 
         private enum class Kind { USER, PASSWORD, TEXT, OTHER }
