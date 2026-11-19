@@ -105,11 +105,13 @@ fun HomeScreen(
         floating = {
             FloatingActionButtonMMD(
                 onClick = if (codes) onNewCode else onNewEntry,
-                shape = androidx.compose.foundation.shape.CircleShape,
+                // The same rounded square as Torrents' add button: 56 dp, 16 dp corners, filled.
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
                 containerColor = MaterialTheme.colorScheme.onSurface,
                 contentColor = MaterialTheme.colorScheme.surface,
+                border = null,
             ) {
-                Icon(Icons.Add, contentDescription = stringResource(if (codes) R.string.cd_new_code else R.string.cd_new_entry), modifier = Modifier.size(30.dp))
+                Icon(Icons.Add, contentDescription = stringResource(if (codes) R.string.cd_new_code else R.string.cd_new_entry), modifier = Modifier.size(24.dp))
             }
         },
     ) {
