@@ -141,6 +141,8 @@ For updates without doing this by hand, add this repository to
 
     https://github.com/wanderwildwood/aikotoba
 
+Questions, ideas, or just saying hello: the wander the dev Discord, <https://discord.gg/UMW8yJg7dQ>
+
 ## Whose work is inside
 
 - [kotpass](https://github.com/keemobile/kotpass) (MIT) reads and writes the KeePass files.
