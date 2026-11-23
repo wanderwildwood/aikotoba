@@ -51,7 +51,9 @@ fun EntryScreen(
         onBack = onBack,
         actions = { BarButton(Icons.Edit, stringResource(R.string.cd_edit), onEdit) },
     ) {
-        PagedColumn(Modifier.fillMaxSize(), showCutRow = true) {
+        val fit = rememberWholeLineFit()
+        val body = MaterialTheme.typography.bodyMedium
+        PagedColumn(Modifier.fillMaxSize().wholeLinePage(fit), showCutRow = true) {
             if (item.username.isNotEmpty()) {
                 item {
                     val label = stringResource(R.string.label_username)
@@ -115,11 +117,17 @@ fun EntryScreen(
                 }
             }
             if (item.notes.isNotEmpty()) {
-                item {
-                    Column(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                item(key = "notes-head") {
+                    Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp)) {
                         TextMMD(text = stringResource(R.string.label_notes), style = MaterialTheme.typography.labelSmall)
-                        SelectionContainer { TextMMD(text = item.notes, style = MaterialTheme.typography.bodyMedium) }
                     }
+                }
+                // Long notes in rows of whole lines, so a turn never opens on half a line.
+                wholeLineItems("notes", item.notes, body, fit) { run, _, textModifier ->
+                    SelectionContainer(Modifier.padding(horizontal = 16.dp)) { TextMMD(text = run, style = body, modifier = textModifier) }
+                }
+                item(key = "notes-gap") {
+                    Spacer(Modifier.height(10.dp))
                     RowGap()
                 }
             }
