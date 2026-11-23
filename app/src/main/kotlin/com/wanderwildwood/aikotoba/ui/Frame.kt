@@ -1,5 +1,6 @@
 package com.wanderwildwood.aikotoba.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
@@ -13,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
 
 /** One line to say along the foot of whatever screen is up: saved, copied, not saved and why. */
 object Notice {
@@ -39,7 +41,9 @@ internal fun Frame(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = { Bar(title, onBack, backIcon, actions) },
         bottomBar = { Notice.text?.let { t -> Column { NoticeStrip(t) { if (Notice.text == t) Notice.text = null } } } },
-        floatingActionButton = floating,
+        // 3 dp above the Scaffold's own 16, so the corner button sits at the height of
+        // Messaging's pencil, which rests on a 3 dp rule (23 Nov 2026).
+        floatingActionButton = { Box(Modifier.padding(bottom = 3.dp)) { floating() } },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding), content = content)
     }
