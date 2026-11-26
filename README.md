@@ -10,8 +10,8 @@ the backup.
 
 | | |
 |---|---|
-| ![The codes, each pressed to copy](screenshots/1-codes.png) | ![One sign-in](screenshots/2-entry.png) |
-| ![A new password, its strength said plainly](screenshots/3-generator.png) | ![About: privacy, terms and licenses](screenshots/4-about.png) |
+| ![The codes, each pressed to copy](screenshots/1-codes.png) | ![Every sign-in, A to Z](screenshots/2-all.png) |
+| ![A new password, its strength said plainly](screenshots/3-generator.png) | ![One sign-in: user name, password, website](screenshots/4-entry.png) |
 
 ## What it does
 
